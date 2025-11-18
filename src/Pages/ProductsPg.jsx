@@ -4,13 +4,13 @@ import pro2 from "../Assets/productImg/Aachar2.png"
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Component/Navbar";
 
-const HomePg = () => {
+const ProductsPg = () => {
     const navigator = useNavigate()
     const [DetailCard, setDetailCard] = useState("close")
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
   {/* --------- Navbar ---------- */}
- <Navbar/>
+
 
   {/* -------- Product Card Section ------------- */}
   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 justify-items-center">
@@ -85,12 +85,10 @@ const HomePg = () => {
       </div>
     </div>
   )}
-  <div>
-    <p onClick={()=> navigator('/layout')} className="text-xl bg-red-300 ">Change Layout </p>
-  </div>
+  
 </div>
 
     );
 };
 
-export default HomePg;
+export default ProductsPg;

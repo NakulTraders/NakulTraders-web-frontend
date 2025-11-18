@@ -8,7 +8,9 @@ function Navbar() {
     const navigator = useNavigate()
     return(<>
      <div className="p-3 w-full bg-amber-500 flex justify-between items-center">
-        <div className="flex items-center space-x-3">
+        <div
+        onClick={()=> navigator('/')}
+        className="flex items-center space-x-3">
           <img src={logo} className="w-8 h-8" alt="logo" />
         </div>
     

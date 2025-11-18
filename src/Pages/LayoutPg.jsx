@@ -13,11 +13,11 @@ function LayoutPg(){
     const navigator = useNavigate()
     return(<>
     <div>
-        <Navbar/>
+       
          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 justify-items-center">
             
               <div className="w-[160px] sm:w-[180px] h-56 p-3 bg-cyan-100 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
-              onClick={()=> navigator('/')}
+              onClick={()=> navigator('/products')}
               >
                 <div className="h-4/5 w-full rounded-2xl overflow-hidden">
                   <img src={pro2} className="w-full h-full object-cover rounded-xl" alt="product" />
@@ -27,7 +27,7 @@ function LayoutPg(){
                  </div>
               </div>
               <div className="w-[160px] sm:w-[180px] h-56 p-3 bg-cyan-100 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
-              onClick={()=> navigator('/')}>
+              onClick={()=> navigator('/products')}>
                 <div className="h-4/5 w-full rounded-2xl overflow-hidden">
                   <img src={pro3} className="w-full h-full object-cover rounded-xl" alt="product" />
                 </div>
@@ -36,7 +36,7 @@ function LayoutPg(){
                  </div>
               </div>
               <div className="w-[160px] sm:w-[180px] h-56 p-3 bg-cyan-100 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
-              onClick={()=> navigator('/')}>
+              onClick={()=> navigator('/products')}>
                 <div className="h-4/5 w-full rounded-2xl overflow-hidden">
                   <img src={pro5} className="w-full h-full object-cover rounded-xl" alt="product" />
                 </div>
@@ -45,7 +45,7 @@ function LayoutPg(){
                  </div>
               </div>
               <div className="w-[160px] sm:w-[180px] h-56 p-3 bg-cyan-100 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
-              onClick={()=> navigator('/')}>
+              onClick={()=> navigator('/products')}>
                 <div className="h-4/5 w-full rounded-2xl overflow-hidden">
                   <img src={pro4} className="w-full h-full object-cover rounded-xl" alt="product" />
                 </div>
@@ -54,7 +54,7 @@ function LayoutPg(){
                  </div>
               </div>
               <div className="w-[160px] sm:w-[180px] h-56 p-3 bg-cyan-100 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
-              onClick={()=> navigator('/')}>
+              onClick={()=> navigator('/products')}>
                 <div className="h-4/5 w-full rounded-2xl overflow-hidden">
                   <img src={pro6} className="w-full h-full object-cover rounded-xl" alt="product" />
                 </div>
@@ -63,6 +63,10 @@ function LayoutPg(){
                  </div>
               </div>
           
+          </div>
+
+          <div className="">
+
           </div>
     </div>
     </>)
