@@ -7,6 +7,7 @@ import ProductsPg from "./Pages/ProductsPg";
 import Footer from "./Component/Footer";
 import ProductCard from "./Pages/ProductCardPg";
 import AdminApp from "./AdminApp";
+import AdminLogin from "./Pages/AdminLogin";
 
 
 
@@ -19,7 +20,8 @@ function App() {
       <Route path="/list" element={<OrderList/>}></Route>
       <Route path="/products" element={<ProductsPg/>}></Route>
       <Route path="/card" element={<ProductCard/>}></Route>
-      <Route path="/admin" element={<AdminApp/>}></Route>
+      <Route path="/admin" element={<AdminLogin/>}></Route>
+      <Route path="/admindashboard" element={<AdminApp/>}></Route>
 
      
     </Routes>
