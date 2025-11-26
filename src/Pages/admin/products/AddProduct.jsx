@@ -62,16 +62,17 @@ export default function AddProduct() {
     const submit = async (e) => {
         e.preventDefault();
         console.log(formData);
-        // const data = new FormData()
-        // data.append("name", formData.name)
-        // data.append("category", formData.category)
-        // data.append("packeging", JSON.stringify(formData.packeging))
-        // data.append("image", ImageFile)
+        // console.log("ImageFile :", ImageFile);
+        const data = new FormData()
+        data.append("name", formData.name)
+        data.append("category", formData.category)
+        data.append("packeging", JSON.stringify(formData.packeging))
+        data.append("product_image", ImageFile)
         if (!formData) {
             alert(`Somthing want's rong !!`)
         }
         // console.log("Final FormData:", [...data.entries()]);
-        const responce = await CreateProductApi(formData);
+        const responce = await CreateProductApi(data);
         console.log("responce :", responce);
 
     };
@@ -231,8 +232,9 @@ export default function AddProduct() {
                     <input
                         name="image"
                         type="file"
-                        // onChange={(e) => setImageFile(e.target.files[0])}
-                        onChange={handleChange}
+                        accept="image/*"
+                        onChange={(e) => setImageFile(e.target.files[0])}
+                        // onChange={handleChange}
                         className="w-full mt-1 p-2 border rounded"
                         required
 
