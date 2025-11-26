@@ -1,5 +1,5 @@
 import React from 'react'
-import InfoCard from '../components/InfoCard'
+import InfoCard from '../../components/InfoCard'
 
 
 export default function Dashboard({ products, orders, stats }){
@@ -30,7 +30,10 @@ return (
 <ul className="mt-3 space-y-2">{orders.slice(0,6).map(o => <li key={o.id} className="flex items-center justify-between p-2 rounded hover:bg-gray-50"><div><div className="font-medium">{o.customer}</div><div className="text-xs text-gray-500">{o.items.length} items • {o.date}</div></div><div className="text-sm">{o.status}</div></li>)}</ul>
 
 
-<div className="mt-4"><svg viewBox="0 0 100 100" className="w-full h-24"><polyline fill="none" stroke="#6366F1" strokeWidth="2" points={svgPoints} /></svg></div>
+<div className="mt-4">
+    <svg viewBox="0 0 100 100" className="w-full h-24">
+        <polyline fill="none" stroke="#6366F1" strokeWidth="2" points={svgPoints} />
+        </svg></div>
 </div>
 </div>
 </div>

@@ -10,7 +10,7 @@ function OrderList() {
     ];
     return (
         <>
-            <div className="w-full p-2 ">
+            <div className="w-full p-2 py-20 ">
                 <div className=" md:flex md:justify-center md:flex-col space-y-3 mx-auto">
 
                     <div className="w-full md:w-2/3 flex flex-col md:flex-row bg-slate-100 rounded-lg overflow-hidden shadow-md border border-gray-200">

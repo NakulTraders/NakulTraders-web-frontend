@@ -5,9 +5,8 @@ import Navbar from "./Component/Navbar";
 import LayoutPg from "./Pages/LayoutPg";
 import ProductsPg from "./Pages/ProductsPg";
 import Footer from "./Component/Footer";
-import ProductCard from "./Pages/ProductCardPg";
 import AdminApp from "./AdminApp";
-import AdminLogin from "./Pages/AdminLogin";
+import AdminLogin from "./Pages/admin/AdminLogin";
 
 
 
@@ -19,7 +18,6 @@ function App() {
       <Route path="/" element={<LayoutPg/>}></Route>
       <Route path="/list" element={<OrderList/>}></Route>
       <Route path="/products" element={<ProductsPg/>}></Route>
-      <Route path="/card" element={<ProductCard/>}></Route>
       <Route path="/admin" element={<AdminLogin/>}></Route>
       <Route path="/admindashboard" element={<AdminApp/>}></Route>
 
