@@ -1,8 +1,49 @@
 import React, { useState } from 'react'
-import { CreateProduct } from '../../../api/NwConfig';
 import CreateProductApi from '../../../api/AuthAPI/CreateProductApi';
 
+//Material UI
+import { green, red } from '@mui/material/colors';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
+import CircularProgress from '@mui/material/CircularProgress';
+import CheckIcon from '@mui/icons-material/Check';
+import SaveIcon from '@mui/icons-material/Save';
+import CloseIcon from '@mui/icons-material/Close';
+
 export default function AddProduct() {
+
+    const [loading, setLoading] = React.useState(false);
+    const [success, setSuccess] = React.useState(false);
+    const [error, setError] = React.useState(false);
+    const timer = React.useRef(undefined);
+
+    const buttonSx = {
+        ...(success && {
+            bgcolor: green[500],
+            '&:hover': {
+                bgcolor: green[700],
+            },
+        }),
+        ...(error && {
+            bgcolor: red[500],
+            '&:hover': {
+                bgcolor: red[700],
+            },
+        }),
+    };
+
+    const handleButtonClick = () => {
+        if (!loading) {
+            setSuccess(false);
+            setLoading(true);
+            timer.current = setTimeout(() => {
+                setSuccess(true);
+                setLoading(false);
+            }, 2000);
+        }
+    };
+
 
     const [formData, setFormData] = useState({
         name: '',
@@ -60,22 +101,67 @@ export default function AddProduct() {
 
     // Submit
     const submit = async (e) => {
-        e.preventDefault();
-        console.log(formData);
-        // console.log("ImageFile :", ImageFile);
-        const data = new FormData()
-        data.append("name", formData.name)
-        data.append("category", formData.category)
-        data.append("packeging", JSON.stringify(formData.packeging))
-        data.append("product_image", ImageFile)
-        if (!formData) {
-            alert(`Somthing want's rong !!`)
-        }
-        // console.log("Final FormData:", [...data.entries()]);
-        const responce = await CreateProductApi(data);
-        console.log("responce :", responce);
+    e.preventDefault();
+    handleButtonClick()
 
-    };
+    // ------------ RESET & START LOADING ------------
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+        // ------------ VALIDATION ------------
+        if (!formData.name || !formData.category || !ImageFile) {
+            setError("Please fill all required fields");
+            setLoading(false);
+            return;
+        }
+
+        // ------------ FORM DATA SETUP ------------
+        const data = new FormData();
+        data.append("name", formData.name);
+        data.append("category", formData.category);
+        data.append("packeging", JSON.stringify(formData.packeging));
+        data.append("product_image", ImageFile);
+
+        // ------------ API CALL ------------
+        const responce = await CreateProductApi(data);
+
+        if (responce.status === 200) {
+            setSuccess("Product created successfully!");
+            console.log("Success:", responce);
+
+            // Optional timeout clear
+            clearTimeout(timer.current);
+
+            // Clear form
+            setFormData({
+                name: "",
+                category: "",
+                packeging: [
+                    {
+                        productQuentity: "",
+                        price: "",
+                        OrderUnit: "",
+                        bigPackagSize: "",
+                        bpPrice: ""
+                    }
+                ],
+            });
+            setImageFile(null);
+        } else {
+            setError("Something went wrong!");
+        }
+
+    } catch (err) {
+        console.log(err);
+        setError("Server error! Please try again.");
+    } finally {
+        // ------------ STOP LOADING ------------
+        setLoading(false);
+    }
+};
+
 
     return (
         <div className="max-w-2xl bg-white p-4 rounded shadow">
@@ -96,11 +182,11 @@ export default function AddProduct() {
                 </div>
 
                 {/* CATEGORY */}
-                
+
                 <div>
                     <label className="block text-sm">Category</label>
                     <select
-                       name="category"
+                        name="category"
                         value={formData.category}
                         onChange={handleChange}
                         className="w-full mt-1 p-2 border rounded bg-white"
@@ -113,7 +199,7 @@ export default function AddProduct() {
                         <option value="papard">Papard</option>
                         <option value="rice papard">Rice Papard</option>
                         <option value="fry papard">Fry Papard</option>
-                        <option value="imported fryms">Imported Fryms</option>  
+                        <option value="imported fryms">Imported Fryms</option>
                         <option value="figur fryms">Figur Fryms</option>
                         <option value="noodels">Noodels</option>
                         <option value="other">Other</option>
@@ -166,7 +252,7 @@ export default function AddProduct() {
 
                             {/* ORDER UNIT */}
                             <div>
-                                <label className="block text-sm">Order Unit</label>
+                                <label className="block text-sm">Unit</label>
                                 <select
                                     name="OrderUnit"
                                     value={value.OrderUnit}
@@ -176,10 +262,12 @@ export default function AddProduct() {
 
                                 >
                                     <option value="">Select Unit</option>
+                                    <option value="KG">KG</option>
                                     <option value="JAR">JAR</option>
                                     <option value="PACK">PACK</option>
+                                    <option value="TIN">TIN</option>
+                                    <option value="CAN">CAN</option>
                                     <option value="BOX">BOX</option>
-                                    <option value="KG">KG</option>
                                 </select>
                             </div>
 
@@ -243,12 +331,57 @@ export default function AddProduct() {
 
                 {/* ACTION BUTTONS */}
                 <div className="flex gap-2">
-                    <button
-                        className="px-4 py-2 bg-indigo-600 text-white rounded"
-                        type="submit"
-                    >
-                        Create product
-                    </button>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {/* <Box sx={{ m: 1, position: 'relative' }}>
+                            <Fab
+                                aria-label="save"
+                                color="primary"
+                                sx={buttonSx}
+                                onClick={handleButtonClick}
+                            >
+                                {success ? <CheckIcon /> : error ? <CloseIcon /> : <SaveIcon />}
+                            </Fab>
+
+                            {loading && (
+                                <CircularProgress
+                                    size={68}
+                                    sx={{
+                                        color: success ? green[500] : error ? red[500] : green[500],
+                                        position: 'absolute',
+                                        top: -6,
+                                        left: -6,
+                                        zIndex: 1,
+                                    }}
+                                />
+                            )}
+                        </Box> */}
+
+                        <Box sx={{ m: 1, position: 'relative' }}>
+                            <Button
+                                variant="contained"
+                                sx={buttonSx}
+                                disabled={loading}
+                                type="submit"
+                            >
+                               
+                                {success ? "Saved" : error ? "Failed" : "Save Product"}
+                            </Button>
+
+                            {loading && (
+                                <CircularProgress
+                                    size={24}
+                                    sx={{
+                                        color: success ? green[500] : error ? red[500] : green[500],
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        marginTop: '-12px',
+                                        marginLeft: '-12px',
+                                    }}
+                                />
+                            )}
+                        </Box>
+                    </Box>
 
                     <button
                         type="reset"

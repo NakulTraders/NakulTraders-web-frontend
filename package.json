@@ -1,9 +1,13 @@
 {
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@fontsource/bebas-neue": "^5.2.6",
     "@fontsource/dancing-script": "^5.2.6",
     "@fontsource/sacramento": "^5.2.6",
     "@heroicons/react": "^2.2.0",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/material": "^7.3.5",
     "@reduxjs/toolkit": "^2.9.0",
     "apexcharts": "^5.3.6",
     "axios": "^1.13.2",

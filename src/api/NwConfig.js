@@ -1,5 +1,5 @@
-// export const API_URL = "http://localhost:7878/"
-export const API_URL = "http://localhost:5000/"
+export const API_URL = "http://localhost:7878/"
+// export const API_URL = "http://localhost:5000/"
 
 
 export const CreateProduct = "admin/createProduct";

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import getAllProductApi from '../../../api/AuthAPI/getAllproductApi'
 import UpdateProductApi from '../../../api/AuthAPI/UpdateProductApi';
 import DeleteProductApi from '../../../api/AuthAPI/DeleteProductApi';
+import { API_URL } from '../../../api/NwConfig';
 
 export default function AllProducts({ AllProductData }) {
     //   console.log("all product page :",AllProductData);
@@ -119,8 +120,8 @@ export default function AllProducts({ AllProductData }) {
                                 {/* IMAGE */}
                                 <td className="p-2 border">
                                     <img
-                                        src={item?.image || "loading"}
-                                        alt="product"
+                                        src={API_URL+item.image || "loading"}
+                                        alt="Loading...."
                                         className="w-14 h-14 object-cover rounded"
                                     />
                                 </td>

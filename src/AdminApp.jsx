@@ -57,12 +57,13 @@ setTimeout(()=> setToasts(t => t.filter(x => x.id !== id)), 3000)
 
 
 
-
-const changeOrderStatus = (id, status) => { setOrders(o=> o.map(x => x.id===id?{...x, status}:x)); pushToast(`Order ${id} -> ${status}`); }
+const changeOrderStatus = (id, status) => { 
+    setOrders(o=> o.map(x => x.id===id?{...x, status}:x)); 
+    pushToast(`Order ${id} -> ${status}`); }
 
 
 function renderContent(){
-if(active === 'dashboard') return <Dashboard products={products} orders={orders} stats={stats} />
+if(active === 'dashboard') return <Dashboard products={products} orders={orders} stats={stats} AllProductData={AllProductData?.length} />
 if(active === 'products_add') return <AddProduct  />
 if(active === 'products_all') return <AllProducts AllProductData={AllProductData}  />
 if(active === 'orders_all' || active === 'orders_manage') return <AllOrders orders={orders} onManage={(id)=> setModal({ open: true, title: `Manage ${id}`, content: <ManageOrders orderId={id} orders={orders} onChangeStatus={changeOrderStatus} /> })} />

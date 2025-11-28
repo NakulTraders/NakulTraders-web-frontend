@@ -2,7 +2,7 @@ import React from 'react'
 import InfoCard from '../../components/InfoCard'
 
 
-export default function Dashboard({ products, orders, stats }){
+export default function Dashboard({AllProductData, products, orders, stats }){
 const points = [10,20,18,25,22,30,28]
 const max = Math.max(...points)
 const svgPoints = points.map((p,i) => `${(i/(points.length-1))*100},${100-(p/max)*100}`).join(' ')
@@ -11,8 +11,8 @@ const svgPoints = points.map((p,i) => `${(i/(points.length-1))*100},${100-(p/max
 return (
 <div className="space-y-4">
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-<InfoCard title="Products" number={stats.productCount}>Total products</InfoCard>
-<InfoCard title="Pending Orders" number={stats.pending}>Orders waiting</InfoCard>
+<InfoCard title="Products" number={AllProductData}>Total products</InfoCard>
+    
 <InfoCard title="Orders Today" number={stats.todayCount}>Placed today</InfoCard>
 <InfoCard title="Revenue" number={stats.revenue}>Revenue (mock)</InfoCard>
 </div>

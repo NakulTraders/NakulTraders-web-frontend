@@ -9,12 +9,11 @@ const ProductsPg = () => {
   const navigator = useNavigate()
   const [DetailCard, setDetailCard] = useState("close") // open and close modal
   const [productdetail, setProductDetail] = useState({}) // take product detail for modal
-  
   const [AllProductData, setAllProductData] = useState([]) //take all products data
-  console.log("all product :", AllProductData);
-
+  const [CalcuPrice, setCalcuPrice] = useState()
+  // console.log("all product :", AllProductData);
   const { state } = useLocation();
-  console.log("category name :", state);
+  // console.log("category name :", state);
 
   //surch
   const [search, setSearch] = useState("");
@@ -22,14 +21,70 @@ const ProductsPg = () => {
 
   //surch funcition 
   const filteredData = AllProductData?.filter((item) => {
-        const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
 
-        const matchesCategory = categoryFilter
-            ? item.category.toLowerCase() === categoryFilter.toLowerCase()
-            : true; // no filter → show all
+    const matchesCategory = categoryFilter
+      ? item.category.toLowerCase() === categoryFilter.toLowerCase()
+      : true; // no filter → show all
 
-        return matchesSearch && matchesCategory;
-    });
+    return matchesSearch && matchesCategory;
+  });
+
+  // -------------------------------------------
+  const [OrderPD, setOrderPD] = useState(
+    {
+      name: "",
+      packeging: [
+        {
+          productQuentity: '',
+          price: '',
+          orderUnit: '',
+          orderQuentity: '',
+          orderPrice: ''
+        }
+      ],
+      totalProductAmount: "" //this is the sum of all packeging orderPrice 
+    }
+  );
+
+
+
+  // packaging form change
+ const handlePackegChange = (index, e) => {
+  const { name, value } = e.target;
+console.log(name<" : ",value);
+
+  setOrderPD(prev => {
+    // copy current packaging array
+    const updatedPack = [...prev.packeging];
+
+    // get product detail for this index
+    const product = productdetail.packeging[index];
+
+    // calculate orderPrice 
+    // orderPrice = price * orderQuentity
+    let orderQuentity = name === "orderQuentity" ? value : updatedPack[index].orderQuentity;
+    let price = updatedPack[index].orderUnit === "BOX" ? product.bpPrice : product.price;
+    let orderPrice = orderQuentity ? price * orderQuentity : 0;
+
+    updatedPack[index] = {
+      ...updatedPack[index],
+      [name]: value,
+      productQuentity: product.productQuentity,
+      price: price,
+      orderPrice: orderPrice
+    };
+
+    // total sum of all orderPrice
+    const total = updatedPack.reduce((sum, p) => sum + Number(p.orderPrice || 0), 0);
+
+    return {
+      ...prev,
+      packeging: updatedPack,
+      totalProductAmount: total
+    };
+  });
+};
 
 
   useEffect(() => {
@@ -46,16 +101,16 @@ const ProductsPg = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col ">
       <div className="w-full overflow-scroll text-nowrap h-10 bg-sky-300 fixed mt-12 flex space-x-4 items-center px-5">
-        <p onClick={()=> setCategoryFilter('achar')} className="font-semibold hover:underline" >Achar |</p>
-        <p onClick={()=> setCategoryFilter('noodels')} className="font-semibold hover:underline" >noodels |</p>
-        <p onClick={()=> setCategoryFilter('figur fryms')} className="font-semibold hover:underline" >figur fryms |</p>
-        <p onClick={()=> setCategoryFilter('imported fryms')} className="font-semibold hover:underline" >imported fryms |</p>
-        <p onClick={()=> setCategoryFilter('fry papard')} className="font-semibold hover:underline" >fry papard |</p>
-        <p onClick={()=> setCategoryFilter('rice papard')} className="font-semibold hover:underline" >rice papard |</p>
-        <p onClick={()=> setCategoryFilter('papard')} className="font-semibold hover:underline" >papard |</p>
-        <p onClick={()=> setCategoryFilter('murabba & candy')} className="font-semibold hover:underline" >murabba & candy |</p>
-        <p onClick={()=> setCategoryFilter('other')} className="font-semibold hover:underline" >Other |</p>
-        <p onClick={()=> setCategoryFilter('')} className="font-semibold hover:underline" >All Product |</p>
+        <p onClick={() => setCategoryFilter('achar')} className="font-semibold hover:underline" >Achar |</p>
+        <p onClick={() => setCategoryFilter('noodels')} className="font-semibold hover:underline" >noodels |</p>
+        <p onClick={() => setCategoryFilter('figur fryms')} className="font-semibold hover:underline" >figur fryms |</p>
+        <p onClick={() => setCategoryFilter('imported fryms')} className="font-semibold hover:underline" >imported fryms |</p>
+        <p onClick={() => setCategoryFilter('fry papard')} className="font-semibold hover:underline" >fry papard |</p>
+        <p onClick={() => setCategoryFilter('rice papard')} className="font-semibold hover:underline" >rice papard |</p>
+        <p onClick={() => setCategoryFilter('papard')} className="font-semibold hover:underline" >papard |</p>
+        <p onClick={() => setCategoryFilter('murabba & candy')} className="font-semibold hover:underline" >murabba & candy |</p>
+        <p onClick={() => setCategoryFilter('other')} className="font-semibold hover:underline" >Other |</p>
+        <p onClick={() => setCategoryFilter('')} className="font-semibold hover:underline" >All Product |</p>
       </div>
 
       {/* -------- Product Card Section ------------- */}
@@ -104,7 +159,7 @@ const ProductsPg = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div>
-                      <div className="text-sm font-medium">{item.productQuentity}</div>
+                      <div className="text-sm font-medium" >{item.productQuentity}</div>
                       <div className="text-xs text-gray-500">{item.OrderUnit} • {item.bigPackagSize} per box</div>
                     </div>
                   </div>
@@ -117,11 +172,27 @@ const ProductsPg = () => {
                     <div className="text-sm font-semibold">
                       <input
                         type="number"
+                        name="orderQuentity"
+                        value={OrderPD.packeging[i]?.orderQuentity || ""}
+                        onChange={(e) => handlePackegChange(i, e)}
                         className="w-14 rounded border border-gray-300 px-1 py-1 
-             focus:outline-none focus:ring-0 focus:border-transparent "
+                         focus:outline-none focus:ring-0 focus:border-transparent "
                       />
                     </div>
-                    <div className="text-sm font-semibold"> {item.OrderUnit}</div>
+                    <div className="text-sm font-semibold">
+                      <select
+                        name="orderUnit"
+                        value={OrderPD.packeging[i]?.orderUnit || ""}
+                        onChange={(e) => handlePackegChange(i, e)}
+                        defaultValue={item.OrderUnit}
+                        className="w-14 py-1 border rounded bg-white"
+                        required
+
+                      >
+                        <option value={item.OrderUnit}>{item.OrderUnit}</option>
+                        <option value="BOX">BOX</option>
+                      </select>
+                    </div>
                   </div>
                 </label>
               ))}
