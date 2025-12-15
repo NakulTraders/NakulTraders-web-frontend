@@ -21,7 +21,7 @@ function Footer () {
         {/* Quick Links */}
         <div>
           <h3 className="text-white text-lg font-semibold mb-3">Quick Links</h3>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-sm hover:cursor-pointer">
             <li onClick={()=> navigator('/')} className="hover:text-white">Catrgory</li>
             <li onClick={()=> navigator('/products')} className="hover:text-white">All product</li>
             <li onClick={()=> navigator('/list')} className="hover:text-white">Final List</li>
@@ -32,7 +32,7 @@ function Footer () {
         {/* Important */}
         <div>
           <h3 className="text-white text-lg font-semibold mb-3">Important</h3>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-sm  hover:cursor-pointer">
             <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
             <li><a href="#" className="hover:text-white">Terms & Conditions</a></li>
             <li><a href="#" className="hover:text-white">Refund Policy</a></li>
@@ -44,7 +44,7 @@ function Footer () {
           <h3 className="text-white text-lg font-semibold mb-3">Contact</h3>
           <p className="text-sm">Email: support@example.com</p>
           <p className="text-sm">Phone: 0731-4959500 , 9827791999</p>
-          <div className="flex gap-4 mt-3">
+          <div className="flex gap-4 mt-3  hover:cursor-pointer">
             <a href="#" className="hover:text-white">Facebook</a>
             <a href="#" className="hover:text-white">Instagram</a>
             <a href="#" className="hover:text-white">Twitter</a>

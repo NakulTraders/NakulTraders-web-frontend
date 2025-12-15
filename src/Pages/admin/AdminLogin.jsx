@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function AdminLogin() {
   const [form, setForm] = useState({
@@ -37,6 +37,10 @@ export default function AdminLogin() {
     window.location.href = "/admindashboard";
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
@@ -52,9 +56,8 @@ export default function AdminLogin() {
             <label className="block mb-1 font-medium">Email</label>
             <input
               type="email"
-              className={`w-full p-3 rounded-lg border ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              } focus:ring-2 focus:ring-blue-500 outline-none`}
+              className={`w-full p-3 rounded-lg border ${errors.email ? "border-red-500" : "border-gray-300"
+                } focus:ring-2 focus:ring-blue-500 outline-none`}
               placeholder="admin@example.com"
               value={form.email}
               onChange={(e) =>
@@ -72,9 +75,8 @@ export default function AdminLogin() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className={`w-full p-3 rounded-lg border ${
-                  errors.password ? "border-red-500" : "border-gray-300"
-                } focus:ring-2 focus:ring-blue-500 outline-none`}
+                className={`w-full p-3 rounded-lg border ${errors.password ? "border-red-500" : "border-gray-300"
+                  } focus:ring-2 focus:ring-blue-500 outline-none`}
                 placeholder="Enter password"
                 value={form.password}
                 onChange={(e) =>

@@ -7,6 +7,8 @@ import ProductsPg from "./Pages/ProductsPg";
 import Footer from "./Component/Footer";
 import AdminApp from "./AdminApp";
 import AdminLogin from "./Pages/admin/AdminLogin";
+import OrderFormPg from "./Pages/OrderFormPg";
+import CustomizeOrderPG from "./Pages/CustomizeOrderPg";
 
 
 
@@ -17,9 +19,11 @@ function App() {
      <Routes>
       <Route path="/" element={<LayoutPg/>}></Route>
       <Route path="/list" element={<OrderList/>}></Route>
+      <Route path="/orderForm" element={<OrderFormPg/>}></Route>
       <Route path="/products" element={<ProductsPg/>}></Route>
       <Route path="/admin" element={<AdminLogin/>}></Route>
       <Route path="/admindashboard" element={<AdminApp/>}></Route>
+      <Route path="/customizeOrder" element={<CustomizeOrderPG/>}></Route>
 
      
     </Routes>

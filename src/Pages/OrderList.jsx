@@ -1,240 +1,340 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import pro2 from '../Assets/productImg/Aachar2.png'
+import { API_URL } from "../api/NwConfig";
+import { useNavigate } from "react-router-dom";
+import Loader from "../Component/Loader";
 
 function OrderList() {
-    const [Detail , setDetail] = useState()
-    const productData = [
-        { weight: "200gm", price: "Rs.80", quantity: "10kg", amount: "Rs.1500" },
-        { weight: "500gm", price: "Rs.140", quantity: "5kg", amount: "Rs.700" },
-        { weight: "1kg", price: "Rs.250", quantity: "2kg", amount: "Rs.500" },
-    ];
+    const [loading, setLoading] = useState(false);
+
+    const navigator = useNavigate()
+    const [OrderPL, setOrderPL] = useState([])
+    const [TotalBill, setTotalBill] = useState()
+    const [DetailCard, setDetailCard] = useState("close") // open and close modal
+    const [productdetail, setProductDetail] = useState({}) // take product detail for modal
+
+    const [OrderPD, setOrderPD] = useState(
+        {
+            name: "",
+            packeging: [
+                {
+                    productQuentity: '',
+                    price: '',
+                    orderUnit: '',
+                    orderQuentity: '',
+                    orderPrice: ''
+                }
+            ],
+            totalProductAmount: "" //this is the sum of all packeging orderPrice 
+        }
+    );
+
+    const handleAddToList = () => {
+        const productToStore = {
+            productId: productdetail.productId,
+            name: productdetail.name,
+            image: productdetail.image,
+            packaging: [],
+            totalPrice: productdetail.totalProductAmount
+        };
+
+        // pick only rows with quantity > 0
+        productdetail.packaging.forEach(p => {
+            if (p.orderQuentity && Number(p.orderQuentity) > 0) {
+                productToStore.packaging.push({
+                    productQuentity: p.productQuentity,
+                    orderUnit: p.orderUnit,
+                    unitPrice: p.unitPrice,
+                    orderQuentity: p.orderQuentity,
+                    orderPrice: p.orderPrice
+                });
+            }
+        });
+
+        // Get old data
+        let existing = JSON.parse(localStorage.getItem("cartList")) || [];
+
+        // Check if product already exists
+        const index = existing.findIndex(item => item.productId === productdetail.productId);
+
+        if (index !== -1) {
+            existing[index] = productToStore; // update
+        } else {
+            existing.push(productToStore); // add
+        }
+
+        // Save back to localStorage
+        localStorage.setItem("cartList", JSON.stringify(existing));
+
+        console.log("Saved Product:", productToStore);
+        console.log("Updated Cart:", existing);
+
+        setDetailCard("close");
+    };
+
+    // packaging form change
+    const handlePackegChange = (index, e) => {
+        const { name, value } = e.target;
+        console.log("name :", name, " value:", value);
+        console.log("index", index);
+
+
+        setProductDetail(prev => {
+            // copy current packaging array
+            const updatedPack = [...prev.packaging];
+
+            // get product detail for this index
+            const product = productdetail.packaging[index];
+            console.log("produc :", product);
+
+            // calculate orderPrice 
+            let orderPrice = product.orderQuentity ? product.unitPrice * product.orderQuentity : 0;
+
+            updatedPack[index] = {
+                ...updatedPack[index],
+                [name]: value,
+                orderPrice: orderPrice
+            };
+
+            // total sum of all orderPrice
+            const total = updatedPack.reduce((sum, p) => sum + Number(p.orderPrice || 0), 0);
+
+            return {
+                ...prev,
+                packeging: updatedPack,
+                totalProductAmount: total
+            };
+        });
+    };
+
+    const removeFromList = (id) => {
+        // get old data
+
+        console.log("id :", id);
+
+        const stored = JSON.parse(localStorage.getItem("cartList")) || [];
+        console.log("card list store :", stored);
+
+        // filter out the item
+        const updated = stored.filter(item => item.productId !== id);
+        console.log("update store :", updated);
+
+        // save updated data back
+        localStorage.setItem("cartList", JSON.stringify(updated));
+
+        // update state also (so UI updates immediately)
+        setOrderPL(updated);
+        //calculate update bill
+        calculatebill(updated)
+    };
+
+    const calculatebill = (data) => {
+        const bill = data.reduce((acc, curr) => acc + (curr.totalPrice || 0), 0);
+        //  console.log("bill",bill);
+        setTotalBill(bill)
+    }
+
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        const getOrderList = () => {
+            setLoading(true)
+            const cartList = JSON.parse(localStorage.getItem("cartList"));
+            console.log(cartList);
+            setOrderPL(cartList)
+            calculatebill(cartList)
+            setLoading(false)
+
+        }
+        getOrderList();
+    }, [])
+
+    // console.log("-----", OrderPL || "no");
+    // console.log("product detail", productdetail || "no");
+    // console.log("++", TotalBill);
+
     return (
         <>
             <div className="w-full p-2 py-20 ">
-                <div className=" md:flex md:justify-center md:flex-col space-y-3 mx-auto">
+                {loading && <Loader />}
+                {!loading && (<div>
+                    <div className=" md:flex md:justify-center md:flex-col space-y-3 mx-auto">
 
-                    <div className="w-full md:w-2/3 flex flex-col md:flex-row bg-slate-100 rounded-lg overflow-hidden shadow-md border border-gray-200">
-                        {/* Right Table Section */}
-                        <div className="w-full   bg-lime-50 p-2">
+                        {OrderPL.map((item, index) => {
 
-                            {/* ------- Image and Button ---------------- */}
-                            <div className="flex">
-                                <div>
-                                    <img
-                                        src={pro2}
-                                        alt="product"
-                                        className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg"
-                                    />
-                                    <div className="flex justify-end space-x-2 mt-3">
-                                        <button className="bg-red-500 text-white text-xs px-2 py-1 rounded-md hover:bg-red-600">
-                                            Cancel
-                                        </button>
-                                        <button className="bg-lime-500 text-white text-xs px-2 py-1 rounded-md hover:bg-lime-600">
-                                            Update
-                                        </button>
-                                    </div>
-                                </div>
+                            return (<>
+                                < div className="w-full md:w-2/3 flex flex-col md:flex-row bg-slate-100 rounded-lg overflow-hidden shadow-md border border-gray-200">
+                                    {/* Right Table Section */}
+                                    <div key={index} className="w-full   bg-lime-50 p-2">
 
-                                {/* -------------- Name and Table ------------ */}
-                                <div className="overflow-x-auto w-full px-1 space-y-1 ">
-                                    <div className="flex">
-                                        <div>
-                                            <div className="">
-                                                <p className="whitespace-nowrap">Achar (अचार)</p>
+                                        {/* ------- Image and Button ---------------- */}
+                                        <div className="flex">
+                                            <div>
+                                                <img
+                                                    // src={ API_URL+item?.image || pro2}
+                                                    src={pro2}
+                                                    alt="product"
+                                                    className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg"
+                                                />
+                                                <div className="flex justify-end space-x-2 mt-3">
+                                                    <button
+                                                        onClick={() => { removeFromList(item.productId) }}
+                                                        className="bg-red-500 text-white text-xs px-2 py-1 rounded-md hover:bg-red-600">
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={() => { setDetailCard("open"); setProductDetail(item); }}
+                                                        className="bg-lime-500 text-white text-xs px-2 py-1 rounded-md hover:bg-lime-600">
+                                                        Update
+                                                    </button>
+                                                </div>
+                                            </div>
 
+                                            {/* -------------- Name and Table ------------ */}
+                                            <div className="overflow-x-auto w-full px-1 space-y-1 ">
+                                                <div className="flex">
+                                                    <div>
+                                                        <div className="">
+                                                            <p className="whitespace-nowrap">{item.name}</p>
+
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full flex justify-end items-end ">
+                                                        <p className=" ">Total: <span className="text-lime-700 font-bold ">Rs.{item.totalPrice}</span> </p>
+                                                    </div>
+
+                                                </div>
+                                                <table className="w-full border-gray-300 rounded-md">
+                                                    {/* Table Header */}
+                                                    <thead className="bg-cyan-900 text-white text-xs">
+                                                        <tr>
+                                                            <th className="py-1 px-1 text-left">Weight</th>
+                                                            <th className="py-1 px-1 text-left">Price</th>
+                                                            <th className="py-1 px-1 text-left">Qty</th>
+                                                            <th className="py-1 px-1 text-left">Amt</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    {/* Table Body */}
+                                                    <tbody className="bg-transparent text-gray-700 text-xs">
+                                                        {item.packaging.map((i, index) => (
+                                                            <tr
+                                                                key={index}
+                                                                className="border-t hover:bg-gray-100 transition duration-200"
+                                                            >
+                                                                <td className="py-1 px-1">{i.productQuentity}</td>
+                                                                <td className="py-1 px-1">{i.unitPrice}</td>
+                                                                <td className="py-1 px-1">{i.orderQuentity}</td>
+                                                                <td className="py-1 px-1">{i.orderPrice}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-                                        <div className="w-full flex justify-end items-end ">
-                                            <p className=" ">Total: <span className="text-lime-700 font-bold ">Rs.2700</span> </p>
-                                        </div>
 
                                     </div>
-                                    <table className="w-full border-gray-300 rounded-md">
-                                        {/* Table Header */}
-                                        <thead className="bg-cyan-900 text-white text-xs">
-                                            <tr>
-                                                <th className="py-1 px-1 text-left">Weight</th>
-                                                <th className="py-1 px-1 text-left">Price</th>
-                                                <th className="py-1 px-1 text-left">Qty</th>
-                                                <th className="py-1 px-1 text-left">Amt</th>
-                                            </tr>
-                                        </thead>
-
-                                        {/* Table Body */}
-                                        <tbody className="bg-transparent text-gray-700 text-xs">
-                                            {[
-                                                { weight: "200gm", price: "Rs.80", quantity: "10kg", amount: "Rs.1500" },
-                                                { weight: "500gm", price: "Rs.140", quantity: "5kg", amount: "Rs.700" },
-                                                { weight: "1kg", price: "Rs.250", quantity: "2kg", amount: "Rs.500" },
-                                            ].map((item, index) => (
-                                                <tr
-                                                    key={index}
-                                                    className="border-t hover:bg-gray-100 transition duration-200"
-                                                >
-                                                    <td className="py-1 px-1">{item.weight}</td>
-                                                    <td className="py-1 px-1">{item.price}</td>
-                                                    <td className="py-1 px-1">{item.quantity}</td>
-                                                    <td className="py-1 px-1">{item.amount}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
                                 </div>
-                            </div>
+                            </>)
+                        })}
 
-                        </div>
+
                     </div>
-                    <div className="w-full md:w-2/3 flex flex-col md:flex-row bg-slate-100 rounded-lg overflow-hidden shadow-md border border-gray-200">
-                        {/* Right Table Section */}
-                        <div className="w-full   bg-lime-50 p-2">
+                    <div>
+                        <p className="text-3xl font-serif md:m-5 m-2">Total bill : Rs. {TotalBill || "Loading.."}</p>
+                    </div>
+                    <div className="w-full flex justify-center py-10">
+                        <button
+                            onClick={() => navigator('/orderForm', { state: { TotalBill: TotalBill } })}
+                            className="bg-sky-600 text-white font-semibold py-3 w-3/4 rounded-lg">
+                            Order
+                        </button>
+                    </div>
 
-                            {/* ------- Image and Button ---------------- */}
-                            <div className="flex">
-                                <div>
-                                    <img
-                                        src={pro2}
-                                        alt="product"
-                                        className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg"
-                                    />
-                                    <div className="flex justify-end space-x-2 mt-3">
-                                        <button className="bg-red-500 text-white text-xs px-2 py-1 rounded-md hover:bg-red-600">
-                                            Cancel
-                                        </button>
-                                        <button className="bg-lime-500 text-white text-xs px-2 py-1 rounded-md hover:bg-lime-600">
-                                            Update
-                                        </button>
-                                    </div>
-                                </div>
+                    {DetailCard === "open" && (
+                        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+                            <div className="bg-white w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 max-h-[85vh] rounded-xl overflow-y-auto relative p-4">
+                                <button
+                                    onClick={() => setDetailCard("close")}
+                                    className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black"
+                                >
+                                    ✕
+                                </button>
 
-                                {/* -------------- Name and Table ------------ */}
-                                <div className="overflow-x-auto w-full px-1 space-y-1 ">
-                                    <div className="flex">
-                                        <div>
-                                            <div className="">
-                                                <p className="whitespace-nowrap">Achar (अचार)</p>
+                                <img src={pro2} className="w-full h-48 object-cover rounded-lg mb-4" alt="product" />
+                                <h2 className="text-xl font-bold mb-3">{productdetail?.name}</h2>
 
+                                {/* Quantity Options */}
+                                <div className="space-y-3">
+                                    {productdetail?.packaging.map((item, i) => (
+                                        <label
+                                            key={i}
+                                            className={`flex items-center justify-between gap-3 p-3 rounded-lg border cursor-pinter transition-shadow hover:shadow-sm
+                                       'border-orange-400 bg-orange-50`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div>
+                                                    <div className="text-sm font-medium" >{item?.productQuentity}</div>
+                                                    <div className="text-xs text-gray-500">{item?.orderUnit} • {item?.orderQuentity} per box</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="w-full flex justify-end items-end ">
-                                            <p className=" ">Total: <span className="text-lime-700 font-bold ">Rs.2700</span> </p>
-                                        </div>
 
-                                    </div>
-                                    <table className="w-full border-gray-300 rounded-md">
-                                        {/* Table Header */}
-                                        <thead className="bg-cyan-900 text-white text-xs">
-                                            <tr>
-                                                <th className="py-1 px-1 text-left">Weight</th>
-                                                <th className="py-1 px-1 text-left">Price</th>
-                                                <th className="py-1 px-1 text-left">Qty</th>
-                                                <th className="py-1 px-1 text-left">Amt</th>
-                                            </tr>
-                                        </thead>
-
-                                        {/* Table Body */}
-                                        <tbody className="bg-transparent text-gray-700 text-xs">
-                                            {[
-                                                { weight: "200gm", price: "Rs.80", quantity: "10kg", amount: "Rs.1500" },
-                                                { weight: "500gm", price: "Rs.140", quantity: "5kg", amount: "Rs.700" },
-                                                { weight: "1kg", price: "Rs.250", quantity: "2kg", amount: "Rs.500" },
-                                            ].map((item, index) => (
-                                                <tr
-                                                    key={index}
-                                                    className="border-t hover:bg-gray-100 transition duration-200"
-                                                >
-                                                    <td className="py-1 px-1">{item.weight}</td>
-                                                    <td className="py-1 px-1">{item.price}</td>
-                                                    <td className="py-1 px-1">{item.quantity}</td>
-                                                    <td className="py-1 px-1">{item.amount}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                    <div className="w-full md:w-2/3 flex flex-col md:flex-row bg-slate-100 rounded-lg overflow-hidden shadow-md border border-gray-200">
-                        {/* Right Table Section */}
-                        <div className="w-full   bg-lime-50 p-2">
-
-                            {/* ------- Image and Button ---------------- */}
-                            <div className="flex">
-                                <div>
-                                    <img
-                                        src={pro2}
-                                        alt="product"
-                                        className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-lg"
-                                    />
-                                    <div className="flex justify-end space-x-2 mt-3">
-                                        <button className="bg-red-500 text-white text-xs px-2 py-1 rounded-md hover:bg-red-600">
-                                            Cancel
-                                        </button>
-                                        <button className="bg-lime-500 text-white text-xs px-2 py-1 rounded-md hover:bg-lime-600">
-                                            Update
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* -------------- Name and Table ------------ */}
-                                <div className="overflow-x-auto w-full px-1 space-y-1 ">
-                                    <div className="flex">
-                                        <div>
-                                            <div className="">
-                                                <p className="whitespace-nowrap">Achar (अचार)</p>
-
+                                            <div className="text-right">
+                                                <div className="text-sm font-semibold">₹{item?.unitPrice}</div>
+                                                <div className="text-xs text-gray-500">per {item?.orderUnit}</div>
                                             </div>
-                                        </div>
-                                        <div className="w-full flex justify-end items-end ">
-                                            <p className=" ">Total: <span className="text-lime-700 font-bold ">Rs.2700</span> </p>
-                                        </div>
+                                            <div className="text-right flex">
+                                                <div className="text-sm font-semibold">
+                                                    <input
+                                                        type="number"
+                                                        name="orderQuentity"
+                                                        value={item?.orderQuentity || ""}
+                                                        onChange={(e) => handlePackegChange(i, e)}
+                                                        className="w-14 rounded border border-gray-300 px-1 py-1 
+                                             focus:outline-none focus:ring-0 focus:border-transparent "
+                                                    />
+                                                </div>
+                                                <div className="text-sm font-semibold">
+                                                    {item.orderUnit}
+                                                    {/* <select
+                                            name="orderUnit"
+                                            value={OrderPD.packeging[i]?.orderUnit || ""}
+                                            onChange={(e) => handlePackegChange(i, e)}
+                                            defaultValue={item?.orderUnit}
+                                            className="w-14 py-1 border rounded bg-white"
+                                            required
+                    
+                                          >
+                                            <option value={item?.orderUnit}>{item?.orderUnit}</option>
+                                            <option value="BOX">BOX</option>
+                                          </select> */}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    ))}
+                                    <p>Total price: <span className="text-lime-700 font-bold ">Rs.{productdetail?.totalPrice}</span> </p>
+                                </div>
 
-                                    </div>
-                                    <table className="w-full border-gray-300 rounded-md">
-                                        {/* Table Header */}
-                                        <thead className="bg-cyan-900 text-white text-xs">
-                                            <tr>
-                                                <th className="py-1 px-1 text-left">Weight</th>
-                                                <th className="py-1 px-1 text-left">Price</th>
-                                                <th className="py-1 px-1 text-left">Qty</th>
-                                                <th className="py-1 px-1 text-left">Amt</th>
-                                            </tr>
-                                        </thead>
+                                {/* Buttons */}
+                                <div className="flex justify-center space-x-4 mt-6">
+                                    <button
+                                        onClick={() => setDetailCard("close")}
+                                        className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-xl font-semibold"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => handleAddToList()}
+                                        className="px-4 py-2 text-white bg-lime-600 hover:bg-lime-700 rounded-xl font-semibold"
+                                    >
+                                        Update Order
+                                    </button>
 
-                                        {/* Table Body */}
-                                        <tbody className="bg-transparent text-gray-700 text-xs">
-                                            {[
-                                                { weight: "200gm", price: "Rs.80", quantity: "10kg", amount: "Rs.1500" },
-                                                { weight: "500gm", price: "Rs.140", quantity: "5kg", amount: "Rs.700" },
-                                                { weight: "1kg", price: "Rs.250", quantity: "2kg", amount: "Rs.500" },
-                                            ].map((item, index) => (
-                                                <tr
-                                                    key={index}
-                                                    className="border-t hover:bg-gray-100 transition duration-200"
-                                                >
-                                                    <td className="py-1 px-1">{item.weight}</td>
-                                                    <td className="py-1 px-1">{item.price}</td>
-                                                    <td className="py-1 px-1">{item.quantity}</td>
-                                                    <td className="py-1 px-1">{item.amount}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
-                </div>
-                <div>
-                    <p className="text-3xl md:m-5 m-2">Total bill : Rs.8100</p>
-                </div>
-                <div className="w-full flex justify-center py-10">
-                    <button className="bg-sky-600 text-white font-semibold py-3 w-3/4 rounded-lg">
-                        Order
-                    </button>
-                </div>
+                    )}
+                </div>)}
             </div>
 
 

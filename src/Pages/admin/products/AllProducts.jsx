@@ -3,10 +3,27 @@ import getAllProductApi from '../../../api/AuthAPI/getAllproductApi'
 import UpdateProductApi from '../../../api/AuthAPI/UpdateProductApi';
 import DeleteProductApi from '../../../api/AuthAPI/DeleteProductApi';
 import { API_URL } from '../../../api/NwConfig';
+import Loader from '../../../Component/Loader';
+import {useQuery} from '@tanstack/react-query'
 
-export default function AllProducts({ AllProductData }) {
-    //   console.log("all product page :",AllProductData);
-    const [Productdata, setProductdata] = useState(AllProductData)
+
+export default function AllProducts() {
+        //   console.log("all product page :",AllProductData);
+
+        const {data , isLoading , error , refetch} = useQuery({
+            queryKey:["product"],
+            queryFn: getAllProductApi,
+            staleTime : 20 * 60 * 1000, // 20 minutes
+            refetchOnWindowFocus : false,
+            refetchOnMount : false
+        })
+        const AllProductData = data?.data;
+        console.log("allProduct page : ",AllProductData);
+        
+        const [loading, setLoading] = useState(isLoading);
+        console.log("loading :",isLoading);
+        
+    
 
     //Surch
     const [search, setSearch] = useState("");
@@ -26,6 +43,11 @@ export default function AllProducts({ AllProductData }) {
 
         return matchesSearch && matchesCategory;
     });
+    
+    console.log("filter data :",filteredData);
+    const [Productdata, setProductdata] = useState(filteredData)
+    
+    // const [Productdata, setProductdata] = useState(AllProductData)
 
     //Handel update!!
     const handleUpdateSubmit = async (updatedProduct) => {
@@ -45,8 +67,9 @@ export default function AllProducts({ AllProductData }) {
     };
       
     // Handel Delete product
-    const handleDeleteProduct = async (pro) => {
+    const handleDeleteProduct = async (pro , index) => {
         console.log("Product id:", pro);
+        console.log("Product index:", index);
         try {
        const deletepro = await DeleteProductApi(pro)
             console.log(deletepro);
@@ -55,7 +78,7 @@ export default function AllProducts({ AllProductData }) {
             alert('sonthing wents wrong !!')
         }
         alert("Product delete Successfully");
-
+         setProductdata(Productdata.filter(data => data._id !== pro))
         setEditModalOpen(false);
         } catch (error) {
             console.log(error);
@@ -70,6 +93,8 @@ export default function AllProducts({ AllProductData }) {
 
     return (
         <div className="bg-white rounded shadow p-4">
+             {isLoading && <Loader />}
+             {!isLoading && (<div>
             <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-lg">All Products</h2>
 
@@ -90,7 +115,7 @@ export default function AllProducts({ AllProductData }) {
                         <option value="">All products</option>
                         <option value="achar">Achar</option>
                         <option value="murabba & candy">Murabba & Candy</option>
-                        <option value="papard">Papard</option>
+                        <option value="papad">Papad</option>
                         <option value="rice papard">Rice Papard</option>
                         <option value="fry papard">Fry Papard</option>
                         <option value="imported fryms">Imported Fryms</option>
@@ -101,7 +126,11 @@ export default function AllProducts({ AllProductData }) {
                 </div>
             </div>
 
-            <div className="mt-4 overflow-x-auto">
+            <div className="mt-2 overflow-x-auto">
+                <p className='font-thin'>Total Product:  
+                    <span className='font-heading text-lg mx-1'>{ filteredData?.length}</span>
+                    <button className='border bg-green-300 text-2xl ' onClick={refetch}> Refatch !!</button>
+                </p>
                 <table className="w-full border-collapse">
                     <thead>
                         <tr className="bg-gray-100 text-gray-700 text-sm">
@@ -114,7 +143,7 @@ export default function AllProducts({ AllProductData }) {
                     </thead>
 
                     <tbody>
-                        {filteredData?.map((item, index) => (
+                        {filteredData?.slice().reverse().map((item, index) => (
                             <tr key={index} className="border hover:bg-gray-50">
 
                                 {/* IMAGE */}
@@ -167,7 +196,7 @@ export default function AllProducts({ AllProductData }) {
                                             Update
                                         </button>
                                         <button 
-                                        onClick={()=> handleDeleteProduct(item._id) }
+                                        onClick={()=> handleDeleteProduct(item._id , index) }
                                         className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">
                                             Delete
                                         </button>
@@ -179,7 +208,7 @@ export default function AllProducts({ AllProductData }) {
                     </tbody>
                 </table>
             </div>
-
+                        
             {editModalOpen && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
                     <div className="bg-white w-[95%] max-w-2xl rounded-xl shadow-xl animate-fadeIn">
@@ -360,8 +389,8 @@ export default function AllProducts({ AllProductData }) {
                 </div>
             )}
 
-
-
+        </div>)}
+        
         </div>
     )
 }

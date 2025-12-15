@@ -4,8 +4,12 @@ import pro2 from "../Assets/productImg/Aachar2.png"
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../Component/Navbar";
 import getAllProductApi from "../api/AuthAPI/getAllproductApi";
+import Loader from "../Component/Loader";
+import { API_URL } from "../api/NwConfig";
 
 const ProductsPg = () => {
+      const [loading, setLoading] = useState(false);
+
   const navigator = useNavigate()
   const [DetailCard, setDetailCard] = useState("close") // open and close modal
   const [productdetail, setProductDetail] = useState({}) // take product detail for modal
@@ -17,7 +21,7 @@ const ProductsPg = () => {
 
   //surch
   const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState(state.category);
+  const [categoryFilter, setCategoryFilter] = useState(state?.category || "");
 
   //surch funcition 
   const filteredData = AllProductData?.filter((item) => {
@@ -50,164 +54,176 @@ const ProductsPg = () => {
 
 
   // packaging form change
- const handlePackegChange = (index, e) => {
-  const { name, value } = e.target;
-console.log(name, " : ", value);
+  const handlePackegChange = (index, e) => {
+    const { name, value } = e.target;
+    console.log(name, " : ", value);
 
 
-  setOrderPD(prev => {
-    // copy current packaging array
-    const updatedPack = [...prev.packeging];
+    setOrderPD(prev => {
+      // copy current packaging array
+      const updatedPack = [...prev.packeging];
 
-    // get product detail for this index
-    const product = productdetail.packeging[index];
+      // get product detail for this index
+      const product = productdetail.packeging[index];
 
-    // calculate orderPrice 
-    // orderPrice = price * orderQuentity
-    let orderQuentity = name === "orderQuentity" ? value : updatedPack[index].orderQuentity;
-    let price = updatedPack[index].orderUnit === "BOX" ? product.bpPrice : product.price;
-    let orderPrice = orderQuentity ? price * orderQuentity : 0;
+      // calculate orderPrice 
+      // orderPrice = price * orderQuentity
 
-    updatedPack[index] = {
-      ...updatedPack[index],
-      [name]: value,
-      productQuentity: product.productQuentity,
-      price: price,
-      orderPrice: orderPrice
-    };
+      const unit = name === "orderUnit"? value : updatedPack[index].orderUnit; // OLD unit
+      let orderQuentity = name === "orderQuentity" ? Number( value) : Number(updatedPack[index].orderQuentity || 0);
+      let price = unit === "BOX" ? Number(product.bpPrice) : Number(product.price);
+      let orderPrice = orderQuentity ? price * orderQuentity : 0;
+      console.log("orderQuentity : ", orderQuentity);
+      console.log("price :",price);
+      
+      
 
-    // total sum of all orderPrice
-    const total = updatedPack.reduce((sum, p) => sum + Number(p.orderPrice || 0), 0);
+      updatedPack[index] = {
+        ...updatedPack[index],
+        [name]: value,
+        productQuentity: product.productQuentity,
+        price: price,
+        orderPrice: orderPrice
+      };
 
-    return {
-      ...prev,
-      packeging: updatedPack,
-      totalProductAmount: total
-    };
-  });
-};
+      // total sum of all orderPrice
+      const total = updatedPack.reduce((sum, p) => sum + Number(p.orderPrice || 0), 0);
+        setCalcuPrice(total)
+      return {
+        ...prev,
+        packeging: updatedPack,
+        totalProductAmount: total
+      };
+    });
+  };
 
 
   useEffect(() => {
+    window.scrollTo(0,0);
     async function getallproduct() {
+      setLoading(true)
       const alldata = await getAllProductApi()
       console.log("all product data :", alldata.data);
       if (!alldata) (
         alert('product data not get !!')
       )
       setAllProductData(alldata.data)
+      setLoading(false)
     }
     getallproduct();
   }, [])
 
   const handleAddToList = () => {
-  const productToStore = {
-    productId: productdetail._id,
-    name: productdetail.name,
-    image: productdetail.image,
-    packaging: [],
-    totalPrice: OrderPD.totalProductAmount
-  };
+    const productToStore = {
+      productId: productdetail._id,
+      name: productdetail.name,
+      image: productdetail.image,
+      packaging: [],
+      totalPrice: OrderPD.totalProductAmount
+    };
 
-  OrderPD.packeging.forEach((p) => {
-    if (p.orderQuentity && Number(p.orderQuentity) > 0) {
-      productToStore.packaging.push({
-        productQuentity: p.productQuentity,
-        orderUnit: p.orderUnit,
-        unitPrice: p.price,
-        orderQuentity: p.orderQuentity,
-        orderPrice: p.orderPrice
-      });
+    OrderPD.packeging.forEach((p) => {
+      if (p.orderQuentity && Number(p.orderQuentity) > 0) {
+        productToStore.packaging.push({
+          productQuentity: p.productQuentity,
+          orderUnit: p.orderUnit,
+          unitPrice: p.price,
+          orderQuentity: p.orderQuentity,
+          orderPrice: p.orderPrice
+        });
+      }
+    });
+
+    let existing = JSON.parse(localStorage.getItem("cartList")) || [];
+
+    // ----- UPDATE instead of adding duplicate -----
+    const index = existing.findIndex(p => p.productId === productdetail._id);
+
+    if (index !== -1) {
+      existing[index] = productToStore; // replace existing
+    } else {
+      existing.push(productToStore); // add new
     }
-  });
 
-  let existing = JSON.parse(localStorage.getItem("cartList")) || [];
+    localStorage.setItem("cartList", JSON.stringify(existing));
 
-  // ----- UPDATE instead of adding duplicate -----
-  const index = existing.findIndex(p => p.productId === productdetail._id);
-
-  if (index !== -1) {
-    existing[index] = productToStore; // replace existing
-  } else {
-    existing.push(productToStore); // add new
-  }
-
-  localStorage.setItem("cartList", JSON.stringify(existing));
-
-  alert("Product list updated!");
-  console.log("Stored product:", productToStore);
-  console.log("Updated cart list:", existing);
-  setDetailCard("close");
-};
+    alert("Product list updated!");
+    console.log("Stored product:", productToStore);
+    console.log("Updated cart list:", existing);
+    setDetailCard("close");
+  };
 
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col ">
       <div className="w-full overflow-scroll text-nowrap h-10 bg-sky-300 fixed mt-12 flex space-x-4 items-center px-5">
-        <p onClick={() => setCategoryFilter('achar')} className="font-semibold hover:underline" >Achar |</p>
-        <p onClick={() => setCategoryFilter('noodels')} className="font-semibold hover:underline" >noodels |</p>
-        <p onClick={() => setCategoryFilter('figur fryms')} className="font-semibold hover:underline" >figur fryms |</p>
-        <p onClick={() => setCategoryFilter('imported fryms')} className="font-semibold hover:underline" >imported fryms |</p>
-        <p onClick={() => setCategoryFilter('fry papard')} className="font-semibold hover:underline" >fry papard |</p>
-        <p onClick={() => setCategoryFilter('rice papard')} className="font-semibold hover:underline" >rice papard |</p>
-        <p onClick={() => setCategoryFilter('papard')} className="font-semibold hover:underline" >papard |</p>
-        <p onClick={() => setCategoryFilter('murabba & candy')} className="font-semibold hover:underline" >murabba & candy |</p>
-        <p onClick={() => setCategoryFilter('other')} className="font-semibold hover:underline" >Other |</p>
-        <p onClick={() => setCategoryFilter('')} className="font-semibold hover:underline" >All Product |</p>
+        <p onClick={() => setCategoryFilter('achar')} className="font-semibold hover:underline hover:cursor-pointer" >Achar |</p>
+        <p onClick={() => setCategoryFilter('noodels')} className="font-semibold hover:underline hover:cursor-pointer" >noodels |</p>
+        <p onClick={() => setCategoryFilter('figur fryms')} className="font-semibold hover:underline hover:cursor-pointer" >figur fryms |</p>
+        <p onClick={() => setCategoryFilter('imported fryms')} className="font-semibold hover:underline hover:cursor-pointer" >imported fryms |</p>
+        <p onClick={() => setCategoryFilter('fry papard')} className="font-semibold hover:underline hover:cursor-pointer" >fry papard |</p>
+        <p onClick={() => setCategoryFilter('rice papard')} className="font-semibold hover:underline hover:cursor-pointer" >rice papard |</p>
+        <p onClick={() => setCategoryFilter('papard')} className="font-semibold hover:underline hover:cursor-pointer" >papard |</p>
+        <p onClick={() => setCategoryFilter('murabba & candy')} className="font-semibold hover:underline hover:cursor-pointer" >murabba & candy |</p>
+        <p onClick={() => setCategoryFilter('other')} className="font-semibold hover:underline hover:cursor-pointer" >Other |</p>
+        <p onClick={() => setCategoryFilter('Seasonal')} className="font-semibold hover:underline hover:cursor-pointer" >Seasonal |</p>
+        <p onClick={() => setCategoryFilter('')} className="font-semibold hover:underline hover:cursor-pointer" >All Product |</p>
       </div>
-
+       {loading && <Loader />}
+            {!loading && (<div>
       {/* -------- Product Card Section ------------- */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 justify-items-center py-28">
-        {filteredData.map((value, i) => (
+        {filteredData?.length > 0 ? 
+        filteredData?.map((value, i) => (
           <div
             key={i}
             onClick={() => {
-  setDetailCard("open");
-  setProductDetail(value);
+              setDetailCard("open");
+              setProductDetail(value);
 
-  // ------- Step 1: Read cart list -------
-  const existingCart = JSON.parse(localStorage.getItem("cartList")) || [];
-  const existingProduct = existingCart.find(p => p.productId === value._id);
+              // ------- Step 1: Read cart list -------
+              const existingCart = JSON.parse(localStorage.getItem("cartList")) || [];
+              const existingProduct = existingCart.find(p => p.productId === value._id);
 
-  // ------- Step 2: If product already exists → prefill values -------
-  if (existingProduct) {
-    setOrderPD({
-      name: value.name,
-      packeging: value.packeging.map((p, i) => {
-        const saved = existingProduct.packaging[i]; // try match index-based
+              // ------- Step 2: If product already exists → prefill values -------
+              if (existingProduct) {
+                setOrderPD({
+                  name: value.name,
+                  packeging: value.packeging.map((p, i) => {
+                    const saved = existingProduct.packaging[i]; // try match index-based
 
-        return {
-          productQuentity: p.productQuentity,
-          price: saved ? saved.unitPrice : p.price,
-          orderUnit: saved ? saved.orderUnit : p.OrderUnit,
-          orderQuentity: saved ? saved.orderQuentity : "",
-          orderPrice: saved ? saved.orderPrice : 0
-        };
-      }),
-      totalProductAmount: existingProduct.totalPrice
-    });
-  }
+                    return {
+                      productQuentity: p.productQuentity,
+                      price: saved ? saved.unitPrice : p.price,
+                      orderUnit: saved ? saved.orderUnit : p.OrderUnit,
+                      orderQuentity: saved ? saved.orderQuentity : "",
+                      orderPrice: saved ? saved.orderPrice : 0
+                    };
+                  }),
+                  totalProductAmount: existingProduct.totalPrice
+                });
+              }
 
-  // ------- Step 3: If new product → fresh defaults -------
-  else {
-    setOrderPD({
-      name: value.name,
-      packeging: value.packeging.map((p) => ({
-        productQuentity: p.productQuentity,
-        price: p.price,
-        orderUnit: p.OrderUnit,
-        orderQuentity: "",
-        orderPrice: 0
-      })),
-      totalProductAmount: 0
-    });
-  }
-}}
+              // ------- Step 3: If new product → fresh defaults -------
+              else {
+                setOrderPD({
+                  name: value.name,
+                  packeging: value.packeging.map((p) => ({
+                    productQuentity: p.productQuentity,
+                    price: p.price,
+                    orderUnit: p.OrderUnit,
+                    orderQuentity: "",
+                    orderPrice: 0
+                  })),
+                  totalProductAmount: 0
+                });
+              }
+            }}
 
             className="w-[160px] sm:w-[180px] h-56 p-3 bg-slate-200 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
           >
             <div className="h-2/3 w-full rounded-2xl overflow-hidden">
-              <img src={pro2} className="w-full h-full object-cover rounded-xl" alt="product" />
+              <img src={API_URL+value.image} className="w-full h-full object-cover rounded-xl" alt="product" />
             </div>
             <div className="flex-1 flex flex-col justify-between mt-2">
               <div>
@@ -217,7 +233,11 @@ console.log(name, " : ", value);
               <p className="text-right text-base font-bold text-[#32CD32]">Rs.{value.packeging[0].price}</p>
             </div>
           </div>
-        ))}
+        ))
+        : <div className="flex justify-center items-center">
+          <p className="text-lg md:text-3xl font-heading ">No Product Found</p>
+        </div>}
+        
       </div>
 
       {/* -------- Product Detail Card (Popup) -------- */}
@@ -231,7 +251,7 @@ console.log(name, " : ", value);
               ✕
             </button>
 
-            <img src={pro2} className="w-full h-48 object-cover rounded-lg mb-4" alt="product" />
+            <img src={API_URL+productdetail.image} className="w-full h-48 object-cover rounded-lg mb-4" alt="product" />
             <h2 className="text-xl font-bold mb-3">{productdetail.name}</h2>
 
             {/* Quantity Options */}
@@ -267,9 +287,8 @@ console.log(name, " : ", value);
                     <div className="text-sm font-semibold">
                       <select
                         name="orderUnit"
-                        value={OrderPD.packeging[i]?.orderUnit || ""}
+                        value={OrderPD.packeging[i]?.orderUnit || item.orderUnit}
                         onChange={(e) => handlePackegChange(i, e)}
-                        defaultValue={item.OrderUnit}
                         className="w-14 py-1 border rounded bg-white"
                         required
 
@@ -281,7 +300,7 @@ console.log(name, " : ", value);
                   </div>
                 </label>
               ))}
-              <p>Total price: <span className="text-lime-700 font-bold ">Rs.500</span> </p>
+              <p>Total price: <span className="text-lime-700 font-bold ">Rs.{productdetail.totalPrice || CalcuPrice}</span> </p>
             </div>
 
             {/* Buttons */}
@@ -293,17 +312,17 @@ console.log(name, " : ", value);
                 Cancel
               </button>
               <button
-  onClick={handleAddToList}
-  className="px-4 py-2 text-white bg-lime-600 hover:bg-lime-700 rounded-xl font-semibold"
->
-  Add to List
-</button>
+                onClick={handleAddToList}
+                className="px-4 py-2 text-white bg-lime-600 hover:bg-lime-700 rounded-xl font-semibold"
+              >
+                Add to List
+              </button>
 
             </div>
           </div>
         </div>
       )}
-
+    </div>)}
     </div>
 
   );

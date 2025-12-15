@@ -1,11 +1,9 @@
 import axios from "axios";
-import { API_URL, getAllProduct } from "../NwConfig";
+import { API_URL, getAllOrder } from "../NwConfig";
 
-export default async function getAllProductApi(){
+export default async function getAllOrderApi(){
     try{
-        // console.log("Product api is call ----------------------------------------------");
-        
-        const url=API_URL+getAllProduct
+        const url=API_URL+getAllOrder
         // const res=await axios.post(url,form,{withCredentials:true})
         const res=await axios.get(url)
         const resp=res.data
