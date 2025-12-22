@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import CreateOrderApi from "../api/AuthAPI/CreateOrderApi";
 import CreateCustomizeOrderApi from "../api/AuthAPI/CreateCustomizeOrderApi";
+import Swal from "sweetalert2";
+import ButtonLoader from '../Component/ButtonLoader'
+
+
 
 export default function OrderFormPg() {
+     const [loading, setLoading] = useState(false);
     const navigator = useNavigate()
     const [formData, setFormData] = useState({
         Name: "",
@@ -29,23 +34,23 @@ export default function OrderFormPg() {
     //get total bill 
     const location = useLocation()
     const TotalBill = location.state?.TotalBill;
-    const {TextOrder , Ordertype }= location.state;
+    const { TextOrder, Ordertype } = location.state;
     // console.log("order text:",TextOrder);
     // console.log("order type:",Ordertype);
-    
-    const [AllTextOrder , setAllTextOrder] = useState([]) // Store All text order
-    
+
+    const [AllTextOrder, setAllTextOrder] = useState([]) // Store All text order
+
 
     // Fetch data from localStorage
     useEffect(() => {
-        window.scrollTo(0,0)
+        window.scrollTo(0, 0)
         const savedData = JSON.parse(localStorage.getItem("cartList"));
         console.log(savedData);
 
         if (savedData) {
             setLocalData(savedData);
         }
-        setAllTextOrder(TextOrder?.map((item)=> item.text))
+        setAllTextOrder(TextOrder?.map((item) => item.text))
     }, []);
 
     // Handle Change (all input updates)
@@ -60,7 +65,9 @@ export default function OrderFormPg() {
 
     // Handle Submit
     const handleSubmit = async (e) => {
+        // if(loading) return;
         e.preventDefault();
+        setLoading(true)
         console.log("local data :", localData);
         console.log("form data :", formData);
         console.log("Total bill :", TotalBill);
@@ -75,23 +82,37 @@ export default function OrderFormPg() {
             productOrders: localData,
             totalBill: TotalBill
         };
-        console.log("last bill",lastbill);
-        
+        console.log("last bill", lastbill);
+
         const resp = await CreateOrderApi(lastbill);
-        console.log("responce :",resp);
+        console.log("responce :", resp);
 
-        if(!resp.data){
-            return alert("somthing wents wrong !!")
+        if (!resp.data) {
+            return Swal.fire({
+                icon: "error",
+                title: "Network error",
+                text: "Something went wrong!",
+            });
         }
-        
-        alert("Order Placed Successfully!");
-        navigator("/")
 
+        setLoading(false)
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Order Placed Successfully!",
+            showConfirmButton: false,
+            timer: 2000,
+            width: "450px"
+        }).then(() => {
+            navigator("/")
+        })
     };
-    
+
     // Customize Order Handle Submit
     const customizeHandleSubmit = async (e) => {
+        // if(loading) return;
         e.preventDefault();
+        setLoading(true)
         console.log("form data :", formData);
         console.log("text Order :", AllTextOrder);
 
@@ -104,17 +125,30 @@ export default function OrderFormPg() {
             address: formData.address,
             textOrder: AllTextOrder,
         };
-        console.log("last bill",lastbill);
-        
-        const resp = await CreateCustomizeOrderApi(lastbill);
-        console.log("responce :",resp);
+        console.log("last bill", lastbill);
 
-        if(!resp.data){
-            return alert("somthing wents wrong !!")
+        const resp = await CreateCustomizeOrderApi(lastbill);
+        console.log("responce :", resp);
+
+        if (!resp.data) {
+            return Swal.fire({
+                icon: "error",
+                title: "Network error",
+                text: "Something went wrong!",
+
+            });
         }
-        
-        alert("Order Placed Successfully!");
-        navigator("/")
+        setLoading(false)
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Order Placed Successfully!",
+            showConfirmButton: false,
+            timer: 2000,
+            width: "450px"
+        }).then(() => {
+            navigator("/")
+        })
 
     };
 
@@ -126,7 +160,7 @@ export default function OrderFormPg() {
                     Place Your Order
                 </h2>
 
-                <form onSubmit={Ordertype == "customize" ? customizeHandleSubmit: handleSubmit} className="space-y-4">
+                <form  onSubmit={Ordertype == "customize" ? customizeHandleSubmit : handleSubmit } className="space-y-4">
 
                     {/* Farm Name */}
                     <div>
@@ -216,7 +250,7 @@ export default function OrderFormPg() {
                         type="submit"
                         className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
                     >
-                        Place Order
+                       {loading ? <ButtonLoader color="White" /> : "Place Order"}
                     </button>
 
                 </form>

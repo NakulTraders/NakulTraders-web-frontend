@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import pro1 from "../Assets/productImg/Aachar.png"
-import pro2 from "../Assets/productImg/Aachar2.png"
 import { useLocation, useNavigate } from "react-router-dom";
-import Navbar from "../Component/Navbar";
 import getAllProductApi from "../api/AuthAPI/getAllproductApi";
 import Loader from "../Component/Loader";
 import { API_URL } from "../api/NwConfig";
+import Swal from "sweetalert2";
 
 const ProductsPg = () => {
-      const [loading, setLoading] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const navigator = useNavigate()
   const [DetailCard, setDetailCard] = useState("close") // open and close modal
@@ -69,14 +68,14 @@ const ProductsPg = () => {
       // calculate orderPrice 
       // orderPrice = price * orderQuentity
 
-      const unit = name === "orderUnit"? value : updatedPack[index].orderUnit; // OLD unit
-      let orderQuentity = name === "orderQuentity" ? Number( value) : Number(updatedPack[index].orderQuentity || 0);
+      const unit = name === "orderUnit" ? value : updatedPack[index].orderUnit; // OLD unit
+      let orderQuentity = name === "orderQuentity" ? Number(value) : Number(updatedPack[index].orderQuentity || 0);
       let price = unit === "BOX" ? Number(product.bpPrice) : Number(product.price);
       let orderPrice = orderQuentity ? price * orderQuentity : 0;
       console.log("orderQuentity : ", orderQuentity);
-      console.log("price :",price);
-      
-      
+      console.log("price :", price);
+
+
 
       updatedPack[index] = {
         ...updatedPack[index],
@@ -88,7 +87,7 @@ const ProductsPg = () => {
 
       // total sum of all orderPrice
       const total = updatedPack.reduce((sum, p) => sum + Number(p.orderPrice || 0), 0);
-        setCalcuPrice(total)
+      setCalcuPrice(total)
       return {
         ...prev,
         packeging: updatedPack,
@@ -99,7 +98,7 @@ const ProductsPg = () => {
 
 
   useEffect(() => {
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
     async function getallproduct() {
       setLoading(true)
       const alldata = await getAllProductApi()
@@ -147,7 +146,16 @@ const ProductsPg = () => {
 
     localStorage.setItem("cartList", JSON.stringify(existing));
 
-    alert("Product list updated!");
+   
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "Product are added to list",
+      showConfirmButton: false,
+      timer: 2000,
+      toast: true,
+      width: "350px"
+    });
     console.log("Stored product:", productToStore);
     console.log("Updated cart list:", existing);
     setDetailCard("close");
@@ -169,160 +177,160 @@ const ProductsPg = () => {
         <p onClick={() => setCategoryFilter('Seasonal')} className="font-semibold hover:underline hover:cursor-pointer" >Seasonal |</p>
         <p onClick={() => setCategoryFilter('')} className="font-semibold hover:underline hover:cursor-pointer" >All Product |</p>
       </div>
-       {loading && <Loader />}
-            {!loading && (<div>
-      {/* -------- Product Card Section ------------- */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 justify-items-center py-28">
-        {filteredData?.length > 0 ? 
-        filteredData?.map((value, i) => (
-          <div
-            key={i}
-            onClick={() => {
-              setDetailCard("open");
-              setProductDetail(value);
+      {loading && <Loader />}
+      {!loading && (<div>
+        {/* -------- Product Card Section ------------- */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 justify-items-center py-28">
+          {filteredData?.length > 0 ?
+            filteredData?.map((value, i) => (
+              <div
+                key={i}
+                onClick={() => {
+                  setDetailCard("open");
+                  setProductDetail(value);
 
-              // ------- Step 1: Read cart list -------
-              const existingCart = JSON.parse(localStorage.getItem("cartList")) || [];
-              const existingProduct = existingCart.find(p => p.productId === value._id);
+                  // ------- Step 1: Read cart list -------
+                  const existingCart = JSON.parse(localStorage.getItem("cartList")) || [];
+                  const existingProduct = existingCart.find(p => p.productId === value._id);
 
-              // ------- Step 2: If product already exists → prefill values -------
-              if (existingProduct) {
-                setOrderPD({
-                  name: value.name,
-                  packeging: value.packeging.map((p, i) => {
-                    const saved = existingProduct.packaging[i]; // try match index-based
+                  // ------- Step 2: If product already exists → prefill values -------
+                  if (existingProduct) {
+                    setOrderPD({
+                      name: value.name,
+                      packeging: value.packeging.map((p, i) => {
+                        const saved = existingProduct.packaging[i]; // try match index-based
 
-                    return {
-                      productQuentity: p.productQuentity,
-                      price: saved ? saved.unitPrice : p.price,
-                      orderUnit: saved ? saved.orderUnit : p.OrderUnit,
-                      orderQuentity: saved ? saved.orderQuentity : "",
-                      orderPrice: saved ? saved.orderPrice : 0
-                    };
-                  }),
-                  totalProductAmount: existingProduct.totalPrice
-                });
-              }
+                        return {
+                          productQuentity: p.productQuentity,
+                          price: saved ? saved.unitPrice : p.price,
+                          orderUnit: saved ? saved.orderUnit : p.OrderUnit,
+                          orderQuentity: saved ? saved.orderQuentity : "",
+                          orderPrice: saved ? saved.orderPrice : 0
+                        };
+                      }),
+                      totalProductAmount: existingProduct.totalPrice
+                    });
+                  }
 
-              // ------- Step 3: If new product → fresh defaults -------
-              else {
-                setOrderPD({
-                  name: value.name,
-                  packeging: value.packeging.map((p) => ({
-                    productQuentity: p.productQuentity,
-                    price: p.price,
-                    orderUnit: p.OrderUnit,
-                    orderQuentity: "",
-                    orderPrice: 0
-                  })),
-                  totalProductAmount: 0
-                });
-              }
-            }}
+                  // ------- Step 3: If new product → fresh defaults -------
+                  else {
+                    setOrderPD({
+                      name: value.name,
+                      packeging: value.packeging.map((p) => ({
+                        productQuentity: p.productQuentity,
+                        price: p.price,
+                        orderUnit: p.OrderUnit,
+                        orderQuentity: "",
+                        orderPrice: 0
+                      })),
+                      totalProductAmount: 0
+                    });
+                  }
+                }}
 
-            className="w-[160px] sm:w-[180px] h-56 p-3 bg-slate-200 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
-          >
-            <div className="h-2/3 w-full rounded-2xl overflow-hidden">
-              <img src={API_URL+value.image} className="w-full h-full object-cover rounded-xl" alt="product" />
-            </div>
-            <div className="flex-1 flex flex-col justify-between mt-2">
-              <div>
-                <p className="text-base font-semibold truncate">{value.name}</p>
-                <p className="text-sm font-light">{value.packeging[0].productQuentity}...</p>
+                className="w-[160px] sm:w-[180px] h-56 p-3 bg-slate-200 hover:bg-white rounded-2xl hover:shadow-2xl duration-300 cursor-pointer flex flex-col"
+              >
+                <div className="h-2/3 w-full rounded-2xl overflow-hidden">
+                  <img src={API_URL + value.image} className="w-full h-full object-cover rounded-xl" alt="product" />
+                </div>
+                <div className="flex-1 flex flex-col justify-between mt-2">
+                  <div>
+                    <p className="text-base font-semibold truncate">{value.name}</p>
+                    <p className="text-sm font-light">{value.packeging[0].productQuentity}...</p>
+                  </div>
+                  <p className="text-right text-base font-bold text-[#32CD32]">Rs.{value.packeging[0].price}</p>
+                </div>
               </div>
-              <p className="text-right text-base font-bold text-[#32CD32]">Rs.{value.packeging[0].price}</p>
-            </div>
-          </div>
-        ))
-        : <div className="flex justify-center items-center">
-          <p className="text-lg md:text-3xl font-heading ">No Product Found</p>
-        </div>}
-        
-      </div>
+            ))
+            : <div className="flex justify-center items-center">
+              <p className="text-lg md:text-3xl font-heading ">No Product Found</p>
+            </div>}
 
-      {/* -------- Product Detail Card (Popup) -------- */}
-      {DetailCard === "open" && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 max-h-[85vh] rounded-xl overflow-y-auto relative p-4">
-            <button
-              onClick={() => setDetailCard("close")}
-              className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black"
-            >
-              ✕
-            </button>
+        </div>
 
-            <img src={API_URL+productdetail.image} className="w-full h-48 object-cover rounded-lg mb-4" alt="product" />
-            <h2 className="text-xl font-bold mb-3">{productdetail.name}</h2>
-
-            {/* Quantity Options */}
-            <div className="space-y-3">
-              {productdetail.packeging.map((item, i) => (
-                <label
-                  key={i}
-                  className={`flex items-center justify-between gap-3 p-3 rounded-lg border cursor-pinter transition-shadow hover:shadow-sm
-                   'border-orange-400 bg-orange-50`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <div className="text-sm font-medium" >{item.productQuentity}</div>
-                      <div className="text-xs text-gray-500">{item.OrderUnit} • {item.bigPackagSize} per box</div>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-sm font-semibold">₹{item.price}</div>
-                    <div className="text-xs text-gray-500">per {item.OrderUnit}</div>
-                  </div>
-                  <div className="text-right flex">
-                    <div className="text-sm font-semibold">
-                      <input
-                        type="number"
-                        name="orderQuentity"
-                        value={OrderPD.packeging[i]?.orderQuentity || ""}
-                        onChange={(e) => handlePackegChange(i, e)}
-                        className="w-14 rounded border border-gray-300 px-1 py-1 
-                         focus:outline-none focus:ring-0 focus:border-transparent "
-                      />
-                    </div>
-                    <div className="text-sm font-semibold">
-                      <select
-                        name="orderUnit"
-                        value={OrderPD.packeging[i]?.orderUnit || item.orderUnit}
-                        onChange={(e) => handlePackegChange(i, e)}
-                        className="w-14 py-1 border rounded bg-white"
-                        required
-
-                      >
-                        <option value={item.OrderUnit}>{item.OrderUnit}</option>
-                        <option value="BOX">BOX</option>
-                      </select>
-                    </div>
-                  </div>
-                </label>
-              ))}
-              <p>Total price: <span className="text-lime-700 font-bold ">Rs.{productdetail.totalPrice || CalcuPrice}</span> </p>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-center space-x-4 mt-6">
+        {/* -------- Product Detail Card (Popup) -------- */}
+        {DetailCard === "open" && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+            <div className="bg-white w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 max-h-[85vh] rounded-xl overflow-y-auto relative p-4">
               <button
                 onClick={() => setDetailCard("close")}
-                className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-xl font-semibold"
+                className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black"
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddToList}
-                className="px-4 py-2 text-white bg-lime-600 hover:bg-lime-700 rounded-xl font-semibold"
-              >
-                Add to List
+                ✕
               </button>
 
+              <img src={API_URL + productdetail.image} className="w-full h-48 object-cover rounded-lg mb-4" alt="product" />
+              <h2 className="text-xl font-bold mb-3">{productdetail.name}</h2>
+
+              {/* Quantity Options */}
+              <div className="space-y-3">
+                {productdetail.packeging.map((item, i) => (
+                  <label
+                    key={i}
+                    className={`flex items-center justify-between gap-3 p-3 rounded-lg border cursor-pinter transition-shadow hover:shadow-sm
+                   'border-orange-400 bg-orange-50`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="text-sm font-medium" >{item.productQuentity}</div>
+                        <div className="text-xs text-gray-500">{item.OrderUnit} • {item.bigPackagSize} per box</div>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="text-sm font-semibold">₹{item.price}</div>
+                      <div className="text-xs text-gray-500">per {item.OrderUnit}</div>
+                    </div>
+                    <div className="text-right flex">
+                      <div className="text-sm font-semibold">
+                        <input
+                          type="number"
+                          name="orderQuentity"
+                          value={OrderPD.packeging[i]?.orderQuentity || ""}
+                          onChange={(e) => handlePackegChange(i, e)}
+                          className="w-14 rounded border border-gray-300 px-1 py-1 
+                         focus:outline-none focus:ring-0 focus:border-transparent "
+                        />
+                      </div>
+                      <div className="text-sm font-semibold">
+                        <select
+                          name="orderUnit"
+                          value={OrderPD.packeging[i]?.orderUnit || item.orderUnit}
+                          onChange={(e) => handlePackegChange(i, e)}
+                          className="w-14 py-1 border rounded bg-white"
+                          required
+
+                        >
+                          <option value={item.OrderUnit}>{item.OrderUnit}</option>
+                          <option value="BOX">BOX</option>
+                        </select>
+                      </div>
+                    </div>
+                  </label>
+                ))}
+                <p>Total price: <span className="text-lime-700 font-bold ">Rs.{productdetail.totalPrice || CalcuPrice}</span> </p>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-center space-x-4 mt-6">
+                <button
+                  onClick={() => setDetailCard("close")}
+                  className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-xl font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddToList}
+                  className="px-4 py-2 text-white bg-lime-600 hover:bg-lime-700 rounded-xl font-semibold"
+                >
+                  Add to List
+                </button>
+
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>)}
+        )}
+      </div>)}
     </div>
 
   );

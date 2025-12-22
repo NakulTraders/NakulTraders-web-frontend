@@ -19,6 +19,8 @@ import DeleteCustomizeOrderApi from '../../../api/AuthAPI/DeleteCustomizeOrderAp
 import DownloadSingleOrderApi from '../../../api/AuthAPI/DownloadSingleOrderApi';
 import DownloadCustomOrderApi from '../../../api/AuthAPI/DownloadCustomOrderApi';
 
+import Swal from 'sweetalert2';
+
 export default function AllOrders() {
     const [loading, setLoading] = useState(false); // Login on\off
     const [AllOrders, setAllOrders] = useState() //Store all Order data
@@ -33,7 +35,13 @@ export default function AllOrders() {
 
         const customizeData = await getAllCustomizeOrderApi()
         if (!customizeData) {
-            alert("Customize data not found")
+
+            return Swal.fire({
+                icon: "error",
+                title: "Network error",
+                text: "Customize data not found",
+
+            });
         }
         setOrderText(customizeData.data)
         console.log("customize data :", customizeData.data);
@@ -56,19 +64,50 @@ export default function AllOrders() {
             setAllOrders(prev => prev.map(item => (item._id === id ? updatedOrder : item)));
         } catch (err) {
             console.error("update failed", err);
-            alert("Could not update order status. Try again.");
+            alert("");
+            Swal.fire({
+                icon: "error",
+                title: "Network error",
+                text: "Could not update order status. Try again.",
+
+            });
         }
     };
 
     const DeleteOrder = async (id, index) => {
         console.log("id : ", id);
-        const deleteRes = await DeleteOrderAPi(id);
-        if (!deleteRes) {
-            return alert("Something went wrong!");
-        }
-        alert("Order Deleted!");
-        // 🔥 Remove item from AllOrders in UI
-        setAllOrders(prev => prev.filter((order) => order._id !== id));
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Remove!",
+                    text: "Product has been removed .",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                const deleteRes = await DeleteOrderAPi(id);
+                if (!deleteRes) {
+                    return Swal.fire({
+                        icon: "error",
+                        title: "Network error",
+                        text: "Something went wrong!",
+
+                    });
+                }
+
+                // 🔥 Remove item from AllOrders in UI
+                setAllOrders(prev => prev.filter((order) => order._id !== id));
+            }
+        })
     };
 
 
@@ -88,20 +127,43 @@ export default function AllOrders() {
             setOrderText(prev => prev.map(item => (item._id === id ? updatedOrder : item)));
         } catch (err) {
             console.error("update failed", err);
-            alert("Could not update order status. Try again.");
+            Swal.fire({
+                icon: "error",
+                title: "Network error",
+                text: "Could not update order status. Try again.",
+
+            });
         }
     };
 
 
     const custDeleteOrder = async (id, index) => {
         // console.log("id : ", id);
-        const deleteRes = await DeleteCustomizeOrderApi(id);
-        if (!deleteRes) {
-            return alert("Something went wrong!");
-        }
-        alert("Order Deleted!");
-        // 🔥 Remove item from AllOrders in UI
-        setOrderText(prev => prev.filter((order) => order._id !== id));
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it!"
+        }).then(async(result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Remove!",
+                    text: "Product has been removed .",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                const deleteRes = await DeleteCustomizeOrderApi(id);
+                if (!deleteRes) {
+                    return alert("Something went wrong!");
+                }
+                // 🔥 Remove item from AllOrders in UI
+                setOrderText(prev => prev.filter((order) => order._id !== id));
+            }
+        });
     };
 
 

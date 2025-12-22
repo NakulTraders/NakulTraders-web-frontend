@@ -3,6 +3,7 @@ import pro2 from '../Assets/productImg/Aachar2.png'
 import { API_URL } from "../api/NwConfig";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Component/Loader";
+import Swal from "sweetalert2";
 
 function OrderList() {
     const [loading, setLoading] = useState(false);
@@ -74,63 +75,84 @@ function OrderList() {
 
     // packaging form change
     const handlePackegChange = (index, e) => {
-  const { name, value } = e.target;
+        const { name, value } = e.target;
 
-  setProductDetail(prev => {
-    // copy packaging array
-    const updatedPack = [...prev.packaging];
+        setProductDetail(prev => {
+            // copy packaging array
+            const updatedPack = [...prev.packaging];
 
-    // get current product safely from prev
-    const product = updatedPack[index];
+            // get current product safely from prev
+            const product = updatedPack[index];
 
-    // update field
-    const updatedProduct = {
-      ...product,
-      [name]: value
+            // update field
+            const updatedProduct = {
+                ...product,
+                [name]: value
+            };
+
+            // calculate orderPrice using updated values
+            const unitPrice = Number(updatedProduct.unitPrice || 0);
+            const orderQuantity = Number(updatedProduct.orderQuentity || 0);
+
+            updatedProduct.orderPrice = unitPrice * orderQuantity;
+
+            updatedPack[index] = updatedProduct;
+
+            // calculate total
+            const total = updatedPack.reduce(
+                (sum, p) => sum + Number(p.orderPrice || 0),
+                0
+            );
+
+            return {
+                ...prev,
+                packaging: updatedPack, // ✅ fixed typo
+                totalProductAmount: total
+            };
+        });
     };
-
-    // calculate orderPrice using updated values
-    const unitPrice = Number(updatedProduct.unitPrice || 0);
-    const orderQuantity = Number(updatedProduct.orderQuentity || 0);
-
-    updatedProduct.orderPrice = unitPrice * orderQuantity;
-
-    updatedPack[index] = updatedProduct;
-
-    // calculate total
-    const total = updatedPack.reduce(
-      (sum, p) => sum + Number(p.orderPrice || 0),
-      0
-    );
-
-    return {
-      ...prev,
-      packaging: updatedPack, // ✅ fixed typo
-      totalProductAmount: total
-    };
-  });
-};
 
 
     const removeFromList = (id) => {
         // get old data
 
-        console.log("id :", id);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Remove!",
+                    text: "Product has been removed .",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
 
-        const stored = JSON.parse(localStorage.getItem("cartList")) || [];
-        console.log("card list store :", stored);
+                console.log("id :", id);
 
-        // filter out the item
-        const updated = stored.filter(item => item.productId !== id);
-        console.log("update store :", updated);
+                const stored = JSON.parse(localStorage.getItem("cartList")) || [];
+                console.log("card list store :", stored);
 
-        // save updated data back
-        localStorage.setItem("cartList", JSON.stringify(updated));
+                // filter out the item
+                const updated = stored.filter(item => item.productId !== id);
+                console.log("update store :", updated);
 
-        // update state also (so UI updates immediately)
-        setOrderPL(updated);
-        //calculate update bill
-        calculatebill(updated)
+                // save updated data back
+                localStorage.setItem("cartList", JSON.stringify(updated));
+
+                // update state also (so UI updates immediately)
+                setOrderPL(updated);
+                //calculate update bill
+                calculatebill(updated)
+            }
+        });
+
     };
 
     const calculatebill = (data) => {
@@ -138,19 +160,19 @@ function OrderList() {
         //  console.log("bill",bill);
         setTotalBill(bill)
     }
-const getOrderList = () => {
-            setLoading(true)
-            const cartList = JSON.parse(localStorage.getItem("cartList"));
-            console.log(cartList);
-            setOrderPL(cartList)
-            calculatebill(cartList)
-            setLoading(false)
+    const getOrderList = () => {
+        setLoading(true)
+        const cartList = JSON.parse(localStorage.getItem("cartList"));
+        console.log(cartList);
+        setOrderPL(cartList)
+        calculatebill(cartList)
+        setLoading(false)
 
-        }
+    }
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        
+
         getOrderList();
     }, [])
 
@@ -301,18 +323,7 @@ const getOrderList = () => {
                                                 </div>
                                                 <div className="text-sm font-semibold">
                                                     {item.orderUnit}
-                                                    {/* <select
-                                            name="orderUnit"
-                                            value={OrderPD.packeging[i]?.orderUnit || ""}
-                                            onChange={(e) => handlePackegChange(i, e)}
-                                            defaultValue={item?.orderUnit}
-                                            className="w-14 py-1 border rounded bg-white"
-                                            required
-                    
-                                          >
-                                            <option value={item?.orderUnit}>{item?.orderUnit}</option>
-                                            <option value="BOX">BOX</option>
-                                          </select> */}
+
                                                 </div>
                                             </div>
                                         </label>
