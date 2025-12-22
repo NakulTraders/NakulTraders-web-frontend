@@ -68,44 +68,49 @@ function OrderList() {
 
         console.log("Saved Product:", productToStore);
         console.log("Updated Cart:", existing);
-
+        getOrderList();
         setDetailCard("close");
     };
 
     // packaging form change
     const handlePackegChange = (index, e) => {
-        const { name, value } = e.target;
-        console.log("name :", name, " value:", value);
-        console.log("index", index);
+  const { name, value } = e.target;
 
+  setProductDetail(prev => {
+    // copy packaging array
+    const updatedPack = [...prev.packaging];
 
-        setProductDetail(prev => {
-            // copy current packaging array
-            const updatedPack = [...prev.packaging];
+    // get current product safely from prev
+    const product = updatedPack[index];
 
-            // get product detail for this index
-            const product = productdetail.packaging[index];
-            console.log("produc :", product);
-
-            // calculate orderPrice 
-            let orderPrice = product.orderQuentity ? product.unitPrice * product.orderQuentity : 0;
-
-            updatedPack[index] = {
-                ...updatedPack[index],
-                [name]: value,
-                orderPrice: orderPrice
-            };
-
-            // total sum of all orderPrice
-            const total = updatedPack.reduce((sum, p) => sum + Number(p.orderPrice || 0), 0);
-
-            return {
-                ...prev,
-                packeging: updatedPack,
-                totalProductAmount: total
-            };
-        });
+    // update field
+    const updatedProduct = {
+      ...product,
+      [name]: value
     };
+
+    // calculate orderPrice using updated values
+    const unitPrice = Number(updatedProduct.unitPrice || 0);
+    const orderQuantity = Number(updatedProduct.orderQuentity || 0);
+
+    updatedProduct.orderPrice = unitPrice * orderQuantity;
+
+    updatedPack[index] = updatedProduct;
+
+    // calculate total
+    const total = updatedPack.reduce(
+      (sum, p) => sum + Number(p.orderPrice || 0),
+      0
+    );
+
+    return {
+      ...prev,
+      packaging: updatedPack, // ✅ fixed typo
+      totalProductAmount: total
+    };
+  });
+};
+
 
     const removeFromList = (id) => {
         // get old data
@@ -133,11 +138,7 @@ function OrderList() {
         //  console.log("bill",bill);
         setTotalBill(bill)
     }
-
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        const getOrderList = () => {
+const getOrderList = () => {
             setLoading(true)
             const cartList = JSON.parse(localStorage.getItem("cartList"));
             console.log(cartList);
@@ -146,6 +147,10 @@ function OrderList() {
             setLoading(false)
 
         }
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        
         getOrderList();
     }, [])
 
