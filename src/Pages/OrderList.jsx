@@ -185,7 +185,7 @@ function OrderList() {
             <div className="w-full p-2 py-20 ">
                 {loading && <Loader />}
                 {!loading && (<div>
-                        {OrderPL.length != 0 ? <div>
+                        {OrderPL?.length != 0 ? <div>
                     <div className=" md:flex md:justify-center md:flex-col space-y-3 mx-auto">
                         {OrderPL?.map((item, index) => {
 
