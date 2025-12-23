@@ -185,9 +185,9 @@ function OrderList() {
             <div className="w-full p-2 py-20 ">
                 {loading && <Loader />}
                 {!loading && (<div>
+                        {OrderPL.length != 0 ? <div>
                     <div className=" md:flex md:justify-center md:flex-col space-y-3 mx-auto">
-
-                        {OrderPL.map((item, index) => {
+                        {OrderPL?.map((item, index) => {
 
                             return (<>
                                 < div className="w-full md:w-2/3 flex flex-col md:flex-row bg-slate-100 rounded-lg overflow-hidden shadow-md border border-gray-200">
@@ -265,11 +265,19 @@ function OrderList() {
                             </>)
                         })}
 
-
                     </div>
                     <div>
                         <p className="text-3xl font-serif md:m-5 m-2">Total bill : Rs. {TotalBill || "Loading.."}</p>
                     </div>
+                    </div> 
+                    :
+                    <div className="flex justify-center items-center w-full h-full">
+                        <div className="text-center">
+                    <h1 className="text-xl font-semibold">Order Product not found</h1>    
+                        <p onClick={()=> navigator('/')} className="text-lg underline hover:cursor-pointer hover:font-semibold text-blue-600">Add to list Product</p>
+                        </div>
+                    </div>}
+
                     <div className="w-full flex justify-center py-10">
                         <button
                             onClick={() => navigator('/orderForm', { state: { TotalBill: TotalBill } })}
