@@ -10,7 +10,7 @@ function OrderList() {
 
     const navigator = useNavigate()
     const [OrderPL, setOrderPL] = useState([])
-    const [TotalBill, setTotalBill] = useState()
+    const [TotalBill, setTotalBill] = useState(0)
     const [DetailCard, setDetailCard] = useState("close") // open and close modal
     const [productdetail, setProductDetail] = useState({}) // take product detail for modal
 
@@ -156,13 +156,13 @@ function OrderList() {
     };
 
     const calculatebill = (data) => {
-        const bill = data.reduce((acc, curr) => acc + (curr.totalPrice || 0), 0);
+        const bill = data?.reduce((acc, curr) => acc + Number(curr.totalPrice || 0), 0);
         //  console.log("bill",bill);
         setTotalBill(bill)
     }
     const getOrderList = () => {
         setLoading(true)
-        const cartList = JSON.parse(localStorage.getItem("cartList"));
+        const cartList = JSON.parse(localStorage.getItem("cartList")) || [];
         console.log(cartList);
         setOrderPL(cartList)
         calculatebill(cartList)
@@ -185,7 +185,7 @@ function OrderList() {
             <div className="w-full p-2 py-20 ">
                 {loading && <Loader />}
                 {!loading && (<div>
-                        {OrderPL?.length != 0 ? <div>
+                        {OrderPL?.length > 0 ? <div>
                     <div className=" md:flex md:justify-center md:flex-col space-y-3 mx-auto">
                         {OrderPL?.map((item, index) => {
 
