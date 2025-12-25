@@ -23,14 +23,14 @@ function LayoutPg(){
   { id: 1, category:"achar" ,name: "Achar (अचार)", image: pro2 },
   { id: 2, category:"murabba & candy" , name: "Murabba & Candy", image: murabba },
   { id: 3, category:"papad" , name: "Papad", image: papad },
-  { id: 4, category:"rice papard" , name: "Rice Papard", image: ricePapad },
-  { id: 5, category:"fry papard" , name: "Fry Papard", image: neeraj },
+  { id: 4, category:"rice papad" , name: "Rice Papad", image: ricePapad },
+  { id: 5, category:"fry papad" , name: "Fry Papad", image: neeraj },
   { id: 6, category:"imported fryms" , name: "Imported Fryms", image: impFryms },
-  { id: 7, category:"figur fryms" , name: "Figur Fryms", image: figurFryms },
-  { id: 8, category:"noodels" , name: "Noodels", image: pasta },
+  { id: 7, category:"figure fryums" , name: "Figure Fryums", image: figurFryms },
+  { id: 8, category:"noodles" , name: "Noodles", image: pasta },
   { id: 9, category:"other" , name: "Others", image: neeraj },
   { id: 9, category:"seasonal" , name: "Seasonal", image: neeraj },
-  { id: 10, category:"" , name: "All product", image: neeraj }
+  { id: 10, category:"" , name: "All products", image: neeraj }
 ];
 
 useEffect(()=>{

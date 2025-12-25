@@ -13,11 +13,9 @@ export default function TopNavbar({ onToggleSidebar, title = 'Dashboard', onOpen
 
 
             <div className="flex items-center gap-3">
-                <div className="hidden sm:block">
-                    <input aria-label="Search" placeholder="Search products, orders..." className="px-3 py-2 rounded-md border text-sm focus:ring-1 focus:ring-indigo-400 focus:border-indigo-400" />
-                </div>
+                
                 <button aria-label="Profile" onClick={onOpenProfile} className="flex items-center gap-2 p-1 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <span className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600">KV</span>
+                    <span className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600">NT</span>
                 </button>
             </div>
         </header>

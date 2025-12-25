@@ -22,10 +22,10 @@ function Footer () {
         <div>
           <h3 className="text-white text-lg font-semibold mb-3">Quick Links</h3>
           <ul className="space-y-2 text-sm hover:cursor-pointer">
-            <li onClick={()=> navigator('/')} className="hover:text-white">Catrgory</li>
-            <li onClick={()=> navigator('/products')} className="hover:text-white">All product</li>
+            <li onClick={()=> navigator('/')} className="hover:text-white">Category</li>
+            <li onClick={()=> navigator('/products')} className="hover:text-white">All Products</li>
             <li onClick={()=> navigator('/list')} className="hover:text-white">Final List</li>
-            <li onClick={()=> navigator('/admin')} className="hover:text-white">Admin panel</li>
+            <li onClick={()=> navigator('/admin')} className="hover:text-white">Admin Panel</li>
           </ul>
         </div>
 
@@ -57,7 +57,7 @@ function Footer () {
 
       {/* Bottom copyright */}
       <div className="text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} Your Company. All rights reserved.
+        © {new Date().getFullYear()} Nakul Traders. All rights reserved.
       </div>
     </footer>
   );

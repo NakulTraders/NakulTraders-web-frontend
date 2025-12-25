@@ -17,7 +17,7 @@ export default function Sidebar({ collapsed, onNavigate, active, onClose }) {
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-indigo-600 text-white rounded-md flex items-center justify-center font-bold">YT</div>
                     <div className="hidden md:block">
-                        <div className="font-semibold">Your Tiffin</div>
+                        <div className="font-semibold">Nakul Traders</div>
                         <div className="text-xs text-gray-500">Admin</div>
                     </div>
                 </div>

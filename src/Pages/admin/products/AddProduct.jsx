@@ -197,11 +197,11 @@ export default function AddProduct() {
                         <option value="achar">Achar</option>
                         <option value="murabba & candy">Murabba & Candy</option>
                         <option value="papad">Papad</option>
-                        <option value="rice papard">Rice Papard</option>
-                        <option value="fry papard">Fry Papard</option>
-                        <option value="imported fryms">Imported Fryms</option>
-                        <option value="figur fryms">Figur Fryms</option>
-                        <option value="noodels">Noodels</option>
+                        <option value="rice papad">Rice Papad</option>
+                        <option value="fry papad">Fry Papad</option>
+                        <option value="imported fryums">Imported Fryums</option>
+                        <option value="figure fryums">Figur Fryms</option>
+                        <option value="noodles">Noodles</option>
                         <option value="other">Other</option>
                         <option value="seasonal">Seasonal</option>
                     </select>

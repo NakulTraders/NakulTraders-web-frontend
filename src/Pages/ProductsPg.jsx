@@ -165,17 +165,17 @@ const ProductsPg = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col ">
       <div className="w-full overflow-scroll text-nowrap h-10 bg-sky-300 fixed mt-12 flex space-x-4 items-center px-5">
-        <p onClick={() => setCategoryFilter('achar')} className="font-semibold hover:underline hover:cursor-pointer" >Achar |</p>
-        <p onClick={() => setCategoryFilter('noodels')} className="font-semibold hover:underline hover:cursor-pointer" >noodels |</p>
-        <p onClick={() => setCategoryFilter('figur fryms')} className="font-semibold hover:underline hover:cursor-pointer" >figur fryms |</p>
-        <p onClick={() => setCategoryFilter('imported fryms')} className="font-semibold hover:underline hover:cursor-pointer" >imported fryms |</p>
-        <p onClick={() => setCategoryFilter('fry papard')} className="font-semibold hover:underline hover:cursor-pointer" >fry papard |</p>
-        <p onClick={() => setCategoryFilter('rice papard')} className="font-semibold hover:underline hover:cursor-pointer" >rice papard |</p>
-        <p onClick={() => setCategoryFilter('papard')} className="font-semibold hover:underline hover:cursor-pointer" >papard |</p>
-        <p onClick={() => setCategoryFilter('murabba & candy')} className="font-semibold hover:underline hover:cursor-pointer" >murabba & candy |</p>
-        <p onClick={() => setCategoryFilter('other')} className="font-semibold hover:underline hover:cursor-pointer" >Other |</p>
-        <p onClick={() => setCategoryFilter('Seasonal')} className="font-semibold hover:underline hover:cursor-pointer" >Seasonal |</p>
-        <p onClick={() => setCategoryFilter('')} className="font-semibold hover:underline hover:cursor-pointer" >All Product |</p>
+        <p onClick={() => setCategoryFilter('achar')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >Achar |</p>
+        <p onClick={() => setCategoryFilter('noodles')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >noodels |</p>
+        <p onClick={() => setCategoryFilter('figure fryums')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >figure fryums |</p>
+        <p onClick={() => setCategoryFilter('imported fryums')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >imported fruyms |</p>
+        <p onClick={() => setCategoryFilter('fry papad')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >fry papad |</p>
+        <p onClick={() => setCategoryFilter('rice papad')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >rice papad |</p>
+        <p onClick={() => setCategoryFilter('papad')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >papad |</p>
+        <p onClick={() => setCategoryFilter('murabba & candy')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >murabba & candy |</p>
+        <p onClick={() => setCategoryFilter('other')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >Other |</p>
+        <p onClick={() => setCategoryFilter('Seasonal')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >Seasonal |</p>
+        <p onClick={() => setCategoryFilter('')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >All Products |</p>
       </div>
       {loading && <Loader />}
       {!loading && (<div>
