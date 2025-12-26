@@ -264,6 +264,7 @@ export default function AddProduct() {
                                 >
                                     <option value="">Select Unit</option>
                                     <option value="KG">KG</option>
+                                    <option value="UNIT">UNIT</option>
                                     <option value="JAR">JAR</option>
                                     <option value="PACK">PACK</option>
                                     <option value="TIN">TIN</option>

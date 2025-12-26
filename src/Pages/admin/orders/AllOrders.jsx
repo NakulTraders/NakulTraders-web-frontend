@@ -181,6 +181,10 @@ export default function AllOrders() {
             {!loading && (
                 <div>
                     <div>
+                        <div className='flex text-nowrap'>
+                        <div className='flex items-center text-3xl font-bold text-sky-700 px-3'>
+                            <p>{!ShowOrder ? "#Detail Orders" : "#Customize Order"}</p>
+                        </div>
                         <div className='w-full flex justify-end py-3 space-x-3'>
                             <button
                                 onClick={() => setShowOrder(!ShowOrder)}
@@ -191,6 +195,7 @@ export default function AllOrders() {
                                 refresh
                                 <HiRefresh className='text-2xl ' />
                             </button>
+                        </div>
                         </div>
                         {ShowOrder ? <div>
                             {/* ------------------- Text Order List ----------- */}
@@ -218,6 +223,10 @@ export default function AllOrders() {
                                                                     <p className="text-sm text-gray-500">Transportation: {order.transportation}</p>
                                                                 </dic>
                                                             </dic>
+                                                            <div>
+                                                                 <p className='underline text-lg'>Order Id: <span className='font-semibold underline'>{order.orderId}</span></p>
+
+                                                            </div>
                                                         </div>
                                                         <div className="text-right flex items-end h-20">
                                                             <div>
@@ -300,7 +309,11 @@ export default function AllOrders() {
                                                                     <p className="text-sm text-gray-500">GST: {order.GST}</p>
                                                                     <p className="text-sm text-gray-500">Transportation: {order.transportation}</p>
                                                                 </dic>
+
                                                             </dic>
+                                                                <div>
+                                                                <p className='underline text-lg'>Order Id: <span className='font-semibold underline'>{order.orderId}</span></p>
+                                                                </div>
                                                         </div>
 
 
