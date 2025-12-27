@@ -142,6 +142,24 @@ export default function OrderFormPg() {
 
         setorderResp(resp.data)
         setLoading(false)
+         // open whatsApp on onClick
+    const openWhatsApp = () => {
+        console.log("order detail alert ====== :",resp.data);
+
+        const phoneNumber = "919755034995"; // country code + number
+        const message = `
+        Order is Confirmed 
+        Order Id : ${resp.data.orderId}
+        Name : ${resp.data.firmName}
+        City : ${resp.data.city}
+        Transportation : ${resp.data.transportation}
+        `;
+
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+
+        navigator('/')
+    };
         
         Swal.fire({
             position: "center",
@@ -190,7 +208,7 @@ export default function OrderFormPg() {
                         .getElementById("download-btn")
                         .addEventListener("click", async () => {
                             await captureAndDownload(); // screenshot + download
-                            Swal.close();               // ✅ close ONLY after click
+                            // Swal.close();               // ✅ close ONLY after click
 
                         });
                     document.getElementById("GoToWhatsApp").addEventListener("click", ()=>{openWhatsApp() ;  Swal.close();})
@@ -230,8 +248,26 @@ export default function OrderFormPg() {
             });
         }
         setLoading(false)
+        setorderResp(resp.data)
 
-            console.log("order detail alert :",orderResp);
+        // open whatsApp on onClick
+    const openWhatsApp = () => {
+        console.log("order detail alert ====== :",resp.data);
+
+        const phoneNumber = "919755034995"; // country code + number
+        const message = `
+        Order is Confirmed 
+        Order Id : ${resp.data.orderId}
+        Name : ${resp.data.firmName}
+        City : ${resp.data.city}
+        Transportation : ${resp.data.transportation}
+        `;
+
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+
+        navigator('/')
+    };
 
         Swal.fire({
             position: "center",
@@ -243,7 +279,7 @@ export default function OrderFormPg() {
         }).then(() => {
             navigator("/")
         }).then(() => {
-            console.log("order detail alert :",orderResp);
+            // console.log("order detail alert :",orderResp);
             
             Swal.fire({
                 title: "Order Confirmed 🎉",
@@ -263,6 +299,12 @@ export default function OrderFormPg() {
       >
         Download Screenshot
       </button>
+       <button
+        id="GoToWhatsApp"
+        style="margin-top:10px;width:100%;padding:8px;background:#22c55e;color:white;border:none;border-radius:6px;"
+      >
+        Go to WhatsApp
+      </button>
     </div>
   `,
                 showConfirmButton: false,
@@ -274,32 +316,17 @@ export default function OrderFormPg() {
                         .getElementById("download-btn")
                         .addEventListener("click", async () => {
                             await captureAndDownload(); // screenshot + download
-                            Swal.close();               // ✅ close ONLY after click
+                            // Swal.close();               // ✅ close ONLY after click
                         });
+                    document.getElementById("GoToWhatsApp").addEventListener("click", ()=>{openWhatsApp() ;  Swal.close();})
+
                 }
             });
         })
 
     };
 
-     // open whatsApp on onClick
-    const openWhatsApp = () => {
-        console.log("order detail alert ====== :",orderResp);
-
-        const phoneNumber = "919755034995"; // country code + number
-        const message = `
-        Order is Confirmed 
-        Order Id : ${orderResp.orderId}
-        Name : ${orderResp.firmName}
-        City : ${orderResp.city}
-        Transportation : ${orderResp.transportation}
-        `;
-
-        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        window.open(url, "_blank");
-
-        navigator('/')
-    };
+    
 
     
 
