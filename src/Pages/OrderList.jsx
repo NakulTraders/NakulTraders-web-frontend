@@ -266,8 +266,10 @@ function OrderList() {
                         })}
 
                     </div>
-                    <div>
-                        <p className="text-3xl font-serif md:m-5 m-2">Total bill : Rs. {TotalBill || "Loading.."}</p>
+                    <div className="m-2 md:m-5">
+                        <p className="text-3xl font-serif  ">Total bill : Rs. {TotalBill || "Loading.."}</p>
+                            <p>( परिवहन शुल्क अंतिम बिल में जोड़ा जाएगा। )</p>
+                        <p>Transportation cost will be added to the final bill</p> 
                     </div>
                     </div> 
                     :

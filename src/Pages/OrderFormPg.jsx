@@ -4,11 +4,13 @@ import CreateOrderApi from "../api/AuthAPI/CreateOrderApi";
 import CreateCustomizeOrderApi from "../api/AuthAPI/CreateCustomizeOrderApi";
 import Swal from "sweetalert2";
 import ButtonLoader from '../Component/ButtonLoader'
+import html2canvas from "html2canvas";
 
 
 
 export default function OrderFormPg() {
-     const [loading, setLoading] = useState(false);
+    const [orderResp ,setorderResp] = useState({})
+    const [loading, setLoading] = useState(false);
     const navigator = useNavigate()
     const [formData, setFormData] = useState({
         Name: "",
@@ -63,6 +65,49 @@ export default function OrderFormPg() {
         }));
     };
 
+    //Take automatic screen short function
+    const captureAndDownload = async () => {
+        const element = document.getElementById("order-receipt");
+        if (!element) return;
+
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            backgroundColor: "#ffffff",
+
+            onclone: (clonedDoc) => {
+                // 🔥 REMOVE ALL EXTERNAL CSS (Tailwind, FontAwesome)
+                clonedDoc.querySelectorAll("link, style").forEach(el => el.remove());
+
+                // 🔥 FORCE SAFE STYLES
+                const clonedEl = clonedDoc.getElementById("order-receipt");
+                if (clonedEl) {
+                    clonedEl.style.all = "unset";
+                    clonedEl.style.fontFamily = "Arial";
+                    clonedEl.style.color = "#000";
+                    clonedEl.style.background = "#fff";
+                    clonedEl.style.padding = "16px";
+                    clonedEl.style.border = "1px solid #ddd";
+                    clonedEl.style.borderRadius = "8px";
+                    clonedEl.style.width = "100px";
+                }
+
+                // 🔥 FORCE BODY COLOR (THIS FIXES okLCH)
+                clonedDoc.body.style.background = "#ffffff";
+                clonedDoc.documentElement.style.background = "#ffffff";
+            }
+        });
+
+        const png = canvas.toDataURL("image/png");
+
+        const link = document.createElement("a");
+        link.href = png;
+        link.download = `order-${Date.now()}.png`;
+        link.click();
+    };
+
+   
+
+
     // Handle Submit
     const handleSubmit = async (e) => {
         // if(loading) return;
@@ -95,7 +140,9 @@ export default function OrderFormPg() {
             });
         }
 
+        setorderResp(resp.data)
         setLoading(false)
+        
         Swal.fire({
             position: "center",
             icon: "success",
@@ -104,7 +151,51 @@ export default function OrderFormPg() {
             timer: 2000,
             width: "450px"
         }).then(() => {
-            navigator("/")
+            // navigator("/")
+        }).then(() => {
+            // console.log("order detail alert :",orderResp);
+
+            Swal.fire({
+                title: "Order Confirmed 🎉",
+                html: `
+    <div id="order-receipt">
+      <p style="font-size:18px;font-weight:bold;text-align:center;">
+        Order Confirm
+      </p>
+      <p>Order Id : <b>${resp.data.orderId}</b></p>
+      <p>Name : <b>${resp.data.firmName}</b></p>
+      <p>City : <b>${resp.data.city}</b></p>
+      <p>Transportation : <b>${resp.data.transportation}</b></p>
+
+      <button
+        id="download-btn"
+        style="margin-top:10px;width:100%;padding:8px;background:#22c55e;color:white;border:none;border-radius:6px;"
+      >
+        Download Screenshot
+      </button>
+      <button
+        id="GoToWhatsApp"
+        style="margin-top:10px;width:100%;padding:8px;background:#22c55e;color:white;border:none;border-radius:6px;"
+      >
+        Go to WhatsApp
+      </button>
+    </div>
+  `,
+                showConfirmButton: false,
+                allowOutsideClick: false,   // 🔒 disable outside click close
+                allowEscapeKey: false,      // 🔒 disable ESC key
+                allowEnterKey: false,
+                didOpen: () => {
+                    document
+                        .getElementById("download-btn")
+                        .addEventListener("click", async () => {
+                            await captureAndDownload(); // screenshot + download
+                            Swal.close();               // ✅ close ONLY after click
+
+                        });
+                    document.getElementById("GoToWhatsApp").addEventListener("click", ()=>{openWhatsApp() ;  Swal.close();})
+                }
+            });
         })
     };
 
@@ -139,6 +230,9 @@ export default function OrderFormPg() {
             });
         }
         setLoading(false)
+
+            console.log("order detail alert :",orderResp);
+
         Swal.fire({
             position: "center",
             icon: "success",
@@ -148,9 +242,66 @@ export default function OrderFormPg() {
             width: "450px"
         }).then(() => {
             navigator("/")
+        }).then(() => {
+            console.log("order detail alert :",orderResp);
+            
+            Swal.fire({
+                title: "Order Confirmed 🎉",
+                html: `
+    <div id="order-receipt">
+      <p style="font-size:18px;font-weight:bold;text-align:center;">
+        Order Confirm
+      </p>
+      <p>Order Id : <b>${resp.data.orderId}</b></p>
+      <p>Name : <b>${resp.data.firmName}</b></p>
+      <p>City : <b>${resp.data.city}</b></p>
+      <p>Transportation : <b>${resp.data.transportation}</b></p>
+
+      <button
+        id="download-btn"
+        style="margin-top:10px;width:100%;padding:8px;background:#22c55e;color:white;border:none;border-radius:6px;"
+      >
+        Download Screenshot
+      </button>
+    </div>
+  `,
+                showConfirmButton: false,
+                allowOutsideClick: false,   // 🔒 disable outside click close
+                allowEscapeKey: false,      // 🔒 disable ESC key
+                allowEnterKey: false,
+                didOpen: () => {
+                    document
+                        .getElementById("download-btn")
+                        .addEventListener("click", async () => {
+                            await captureAndDownload(); // screenshot + download
+                            Swal.close();               // ✅ close ONLY after click
+                        });
+                }
+            });
         })
 
     };
+
+     // open whatsApp on onClick
+    const openWhatsApp = () => {
+        console.log("order detail alert ====== :",orderResp);
+
+        const phoneNumber = "919755034995"; // country code + number
+        const message = `
+        Order is Confirmed 
+        Order Id : ${orderResp.orderId}
+        Name : ${orderResp.firmName}
+        City : ${orderResp.city}
+        Transportation : ${orderResp.transportation}
+        `;
+
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+
+        navigator('/')
+    };
+
+    
 
     return (
         <div className="min-h-screen bg-gray-100 px-4 py-10 md:py-20 flex justify-center">
@@ -160,17 +311,17 @@ export default function OrderFormPg() {
                     Place Your Order
                 </h2>
 
-                <form  onSubmit={Ordertype == "customize" ? customizeHandleSubmit : handleSubmit } className="space-y-4">
+                <form onSubmit={Ordertype == "customize" ? customizeHandleSubmit : handleSubmit} className="space-y-4">
 
-                    {/* Farm Name */}
+                    {/* Firm Name */}
                     <div>
-                        <label className="block font-medium text-gray-700">Farm Name</label>
+                        <label className="block font-medium text-gray-700">Firm Name</label>
                         <input
                             type="text"
                             name="Name"
                             value={formData.Name}
                             onChange={handleChange}
-                            placeholder="Enter farm name"
+                            placeholder="Enter firm name"
                             className="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                             required
                         />
@@ -250,11 +401,12 @@ export default function OrderFormPg() {
                         type="submit"
                         className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
                     >
-                       {loading ? <ButtonLoader color="White" /> : "Place Order"}
+                        {loading ? <ButtonLoader color="White" /> : "Place Order"}
                     </button>
 
                 </form>
             </div>
+
         </div>
     );
 }
