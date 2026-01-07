@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
-import Navbar from "../Component/Navbar";
-import pro2 from "../Assets/productImg/Aachar2.png"
-import pro3 from "../Assets/productImg/spices.png"
-import pro4 from "../Assets/productImg/pasta.png"
-import pro5 from "../Assets/productImg/Murabba.png"
-import pro6 from "../Assets/productImg/ketchup.png"
 import murabba from "../Assets/layoutImg/Cmurabba.png"
 import papad from "../Assets/layoutImg/Cpapad.png"
 import ricePapad from "../Assets/layoutImg/CricePapad.png"
-import impFryms from "../Assets/layoutImg/CimportedFryms.png"
-import figurFryms from "../Assets/layoutImg/Cfigurfryms.png"
+// import impFryms from "../Assets/layoutImg/CimportedFryms.png"
+// import figurFryms from "../Assets/layoutImg/Cfigurfryms.png"
 import pasta from "../Assets/layoutImg/Cpasta.png"
 import neeraj from "../Assets/productImg/neerajDemo.png"
+import allPro from "../Assets/productImg/NeerajLogoBg.png";
+import seasonal from "../Assets/productImg/SeasonalImg.jpeg";
+import Frypapad from "../Assets/productImg/FryPapadImg.png";
+import impFryms from "../Assets/productImg/ImportantFryms.jpg";
+import figureFry from "../Assets/productImg/FigureFryums.jpeg";
+import achar from "../Assets/productImg/AcharImg.jpeg";
 import { useNavigate } from "react-router-dom";
 
 
@@ -20,17 +20,17 @@ function LayoutPg(){
     const navigator = useNavigate()
 
     const productCategories = [
-  { id: 1, category:"achar" ,name: "Achar (अचार)", image: pro2 },
+  { id: 1, category:"achar" ,name: "Achar (अचार)", image: achar },
   { id: 2, category:"murabba & candy" , name: "Murabba & Candy", image: murabba },
   { id: 3, category:"papad" , name: "Papad", image: papad },
   { id: 4, category:"rice papad" , name: "Rice Papad", image: ricePapad },
-  { id: 5, category:"fry papad" , name: "Fry Papad", image: neeraj },
+  { id: 5, category:"fry papad" , name: "Fry Papad", image: Frypapad },
   { id: 6, category:"imported fryms" , name: "Imported Fryms", image: impFryms },
-  { id: 7, category:"figure fryums" , name: "Figure Fryums", image: figurFryms },
-  { id: 8, category:"noodles" , name: "Noodles", image: pasta },
+  { id: 7, category:"figure fryums" , name: "Figure Fryums", image: figureFry },
+  { id: 8, category:"noodles" , name: "Pasta & Noodles", image: pasta },
   { id: 9, category:"other" , name: "Others", image: neeraj },
-  { id: 9, category:"seasonal" , name: "Seasonal", image: neeraj },
-  { id: 10, category:"" , name: "All products", image: neeraj }
+  { id: 9, category:"seasonal" , name: "Seasonal", image: seasonal },
+  { id: 10, category:"" , name: "All products", image: allPro }
 ];
 
 useEffect(()=>{
