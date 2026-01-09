@@ -26,15 +26,7 @@ export default function AdminApp() {
 
 
     useEffect(() => {
-        // async function getallproduct() {
-        //     const alldata = await getAllProductApi()
-        //     console.log("all product data :", alldata);
-        //     if (!alldata) (
-        //         alert('product data not get !!')
-        //     )
-        //     setAllProductData(alldata.data)
-        // }
-        // getallproduct();
+        
     }, [])
 
 
