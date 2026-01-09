@@ -146,7 +146,7 @@ export default function OrderFormPg() {
     const openWhatsApp = () => {
         console.log("order detail alert ====== :",resp.data);
 
-        const phoneNumber = "919755034995"; // country code + number
+        const phoneNumber = "919407391999"; // country code + number
         const message = `
         Order is Confirmed 
         Order Id : ${resp.data.orderId}
