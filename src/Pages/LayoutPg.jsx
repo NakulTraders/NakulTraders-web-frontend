@@ -25,7 +25,7 @@ function LayoutPg(){
   { id: 3, category:"papad" , name: "Papad", image: papad },
   { id: 4, category:"rice papad" , name: "Rice Papad", image: ricePapad },
   { id: 5, category:"fry papad" , name: "Fry Papad", image: Frypapad },
-  { id: 6, category:"imported fryms" , name: "Imported Fryms", image: impFryms },
+  { id: 6, category:"imported fryums" , name: "Imported Fryums", image: impFryms },
   { id: 7, category:"figure fryums" , name: "Figure Fryums", image: figureFry },
   { id: 8, category:"noodles" , name: "Pasta & Noodles", image: pasta },
   { id: 9, category:"other" , name: "Others", image: neeraj },

@@ -163,12 +163,12 @@ const ProductsPg = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col ">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="w-full overflow-scroll text-nowrap h-10 bg-sky-300 fixed mt-12 flex space-x-4 items-center px-5">
         <p onClick={() => setCategoryFilter('achar')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >Achar |</p>
         <p onClick={() => setCategoryFilter('noodles')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >noodels |</p>
         <p onClick={() => setCategoryFilter('figure fryums')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >figure fryums |</p>
-        <p onClick={() => setCategoryFilter('imported fryums')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >imported fruyms |</p>
+        <p onClick={() => setCategoryFilter('imported fryums')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >imported fryums |</p>
         <p onClick={() => setCategoryFilter('fry papad')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >fry papad |</p>
         <p onClick={() => setCategoryFilter('rice papad')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >rice papad |</p>
         <p onClick={() => setCategoryFilter('papad')} className="font-semibold hover:underline hover:cursor-pointer uppercase" >papad |</p>
