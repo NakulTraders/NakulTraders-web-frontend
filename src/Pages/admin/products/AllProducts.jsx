@@ -56,7 +56,7 @@ export default function AllProducts() {
 
     //Handel update!!
     const handleUpdateSubmit = async (updatedProduct) => {
-        console.log("Updated Data:", updatedProduct);
+        // console.log("Updated Data:", updatedProduct);
         try {
             const updatedata = await UpdateProductApi(updatedProduct._id, updatedProduct)
 
@@ -103,11 +103,11 @@ export default function AllProducts() {
                     showConfirmButton: false,
                     timer: 1500
                 });
-                console.log("Product id:", pro);
-                console.log("Product index:", index);
+                // console.log("Product id:", pro);
+                // console.log("Product index:", index);
                 try {
                     const deletepro = await DeleteProductApi(pro)
-                    console.log(deletepro);
+                    // console.log(deletepro);
 
                     if (!deletepro) {
                         alert('sonthing wents wrong !!')
@@ -123,7 +123,7 @@ export default function AllProducts() {
     };
 
     const handleUpdateSuccess = (updatedProduct) => {
-        console.log('Image updated successfully!', updatedProduct);
+        // console.log('Image updated successfully!', updatedProduct);
 
         // Update the cache directly
         queryClient.setQueryData(["product"], (oldData) => {

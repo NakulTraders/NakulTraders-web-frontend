@@ -29,8 +29,8 @@ function LayoutPg(){
   { id: 7, category:"figure fryums" , name: "Figure Fryums", image: figureFry },
   { id: 8, category:"noodles" , name: "Pasta & Noodles", image: pasta },
   { id: 9, category:"other" , name: "Others", image: neeraj },
-  { id: 9, category:"seasonal" , name: "Seasonal", image: seasonal },
-  { id: 10, category:"" , name: "All products", image: allPro }
+  { id: 10, category:"seasonal" , name: "Seasonal", image: seasonal },
+  { id: 11, category:"" , name: "All products", image: allPro }
 ];
 
 useEffect(()=>{
