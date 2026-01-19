@@ -1,5 +1,5 @@
-// export const API_URL = "https://neeraj-pickle-backend.onrender.com/"
-export const API_URL = "https://nakultraders-web-backend.onrender.com/"
+export const API_URL = "https://neeraj-pickle-backend.onrender.com/"
+// export const API_URL = "https://nakultraders-web-backend.onrender.com/"
 // export const API_URL = "http://localhost:7878/"
 // export const API_URL = "http://localhost:5000/"
 

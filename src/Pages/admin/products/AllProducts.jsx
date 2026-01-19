@@ -23,10 +23,10 @@ export default function AllProducts() {
         refetchOnMount: false
     })
     const AllProductData = data?.data;
-    console.log("allProduct page : ", AllProductData);
+    // console.log("allProduct page : ", AllProductData);
 
     const [loading, setLoading] = useState(isLoading);
-    console.log("loading :", isLoading);
+    // console.log("loading :", isLoading);
 
 
 
@@ -49,7 +49,7 @@ export default function AllProducts() {
         return matchesSearch && matchesCategory;
     });
 
-    console.log("filter data :", filteredData);
+    // console.log("filter data :", filteredData);
     const [Productdata, setProductdata] = useState(filteredData)
 
     // const [Productdata, setProductdata] = useState(AllProductData)
