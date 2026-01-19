@@ -352,7 +352,9 @@ export default function AllOrders() {
                                             <AccordionDetails>
                                                 {/* PRODUCT DETAILS */}
                                                 <div className="space-y-6">
-                                                    {order.productOrders.map((product) => (
+                                                    {order.productOrders.length == 0 ? <div> <p className='text-3xl'>User Not add product ??</p></div> :
+                                                   <div>
+                                                   {order?.productOrders?.map((product) => (
                                                         <div
                                                             key={product._id}
                                                             className="border rounded-lg p-4 shadow-sm bg-gray-50"
@@ -406,6 +408,8 @@ export default function AllOrders() {
 
                                                         </div>
                                                     ))}
+                                                    </div>
+                                                    }
                                                     <div>
                                                         <button
                                                             onClick={() => DownloadSingleOrderApi(order._id)}
