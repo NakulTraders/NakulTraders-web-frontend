@@ -55,7 +55,7 @@ const ProductsPg = () => {
   // packaging form change
   const handlePackegChange = (index, e) => {
     const { name, value } = e.target;
-    console.log(name, " : ", value);
+    // console.log(name, " : ", value);
 
 
     setOrderPD(prev => {
@@ -72,8 +72,8 @@ const ProductsPg = () => {
       let orderQuentity = name === "orderQuentity" ? Number(value) : Number(updatedPack[index].orderQuentity || 0);
       let price = unit === "BOX" ? Number(product.bpPrice) : Number(product.price);
       let orderPrice = orderQuentity ? price * orderQuentity : 0;
-      console.log("orderQuentity : ", orderQuentity);
-      console.log("price :", price);
+      // console.log("orderQuentity : ", orderQuentity);
+      // console.log("price :", price);
 
 
 
@@ -102,7 +102,7 @@ const ProductsPg = () => {
     async function getallproduct() {
       setLoading(true)
       const alldata = await getAllProductApi()
-      console.log("all product data :", alldata.data);
+      // console.log("all product data :", alldata.data);
       if (!alldata) (
         alert('product data not get !!')
       )
@@ -156,8 +156,10 @@ const ProductsPg = () => {
       toast: true,
       width: "350px"
     });
-    console.log("Stored product:", productToStore);
-    console.log("Updated cart list:", existing);
+    // console.log("Stored product:", productToStore);
+    console.log("product add to list");
+    // console.log("Updated cart list:", existing);
+    console.log("Updated cart list:");
     setDetailCard("close");
   };
 
