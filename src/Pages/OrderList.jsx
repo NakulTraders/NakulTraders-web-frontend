@@ -285,11 +285,19 @@ function OrderList() {
                     </div>}
 
                     <div className="w-full flex justify-center py-10">
+                       {TotalBill == 0 ? 
+                        <button
+                            onClick={() => navigator('/')}
+                            className="bg-sky-600 text-white font-semibold py-3 w-3/4 rounded-lg">
+                            Goto Home page 
+                        </button>
+                        :
                         <button
                             onClick={() => navigator('/orderForm', { state: { TotalBill: TotalBill } })}
                             className="bg-sky-600 text-white font-semibold py-3 w-3/4 rounded-lg">
                             Order
                         </button>
+                        }
                     </div>
 
                     {DetailCard === "open" && (

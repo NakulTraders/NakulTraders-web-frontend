@@ -4,11 +4,15 @@ import { ShoppingCart, Package, TrendingUp, Clock, AlertCircle, Eye } from 'luci
 import { useQuery } from '@tanstack/react-query';
 import getAllProductApi from '../../api/AuthAPI/getAllproductApi';
 import getAllOrderApi from '../../api/AuthAPI/getAllOrderApi';
+import getAllCustomizeOrderApi from "../../api/AuthAPI/getAllCustomizeOrderApi"
 
 
 
 
 export default function Dashboard() {
+
+    // State for pending orders filter
+    const [pendingFilter, setPendingFilter] = React.useState('today'); // 'today' or 'alltime'
 
     // Here we fatch Product data through useQuery and store data in cache 
     const { data, isLoading, error, refetch } = useQuery({
@@ -19,6 +23,7 @@ export default function Dashboard() {
         refetchOnMount: false
     })
 
+    // here we fatch Order 
     const { data: orderData, isLoading: orderDataLoading, error: orderError, refetch: orderRefetch } = useQuery({
         queryKey: ["order"],
         queryFn: getAllOrderApi,
@@ -26,17 +31,24 @@ export default function Dashboard() {
         refetchOnWindowFocus: false,
         refetchOnMount: false
     })
-    console.log(orderData);
+    
+    const { data: custOrderData, isLoading: custOrderDataLoading, error: custOrderError, refetch: custOrderRefetch } = useQuery({
+        queryKey: ["customOrder"],
+        queryFn: getAllCustomizeOrderApi,
+        staleTime: 20 * 60 * 1000, // 20 minutes
+        refetchOnWindowFocus: false,
+        refetchOnMount: false
+    })
 
-    const stats = {
-        totalProducts: data?.data?.length || "....",
-        ordersToday: orderData?.data?.length || '....',
-        customOrdersToday: 5,
-        revenue: 1384,
-        pendingOrders: 8
-    };
-
+    // Helper function to calculate daily order stats
     function getDailyOrderStats(orders, targetDate) {
+        if (!orders || !Array.isArray(orders)) return {
+            totalOrders: 0,
+            totalRevenue: 0,
+            ordersByStatus: {},
+            orders: []
+        };
+
         // Default to current date (today) if no date provided
         const filterDate = targetDate ? new Date(targetDate) : new Date();
 
@@ -75,18 +87,107 @@ export default function Dashboard() {
         };
     }
 
-    const recentOrders = [
-        { id: 'ORD-001', customer: 'Rajesh Kumar', items: 5, amount: 450, status: 'pending', type: 'standard', time: '10 mins ago' },
-        { id: 'ORD-002', customer: 'Priya Sharma', items: 3, amount: 280, status: 'completed', type: 'standard', time: '25 mins ago' },
-        { id: 'CUST-001', customer: 'Amit Patel', items: 'Custom', amount: 520, status: 'pending', type: 'custom', time: '1 hour ago' },
-        { id: 'ORD-003', customer: 'Sneha Verma', items: 8, amount: 680, status: 'processing', type: 'standard', time: '2 hours ago' }
-    ];
+    // Calculate today's stats for regular orders only (custom orders don't have amounts)
+    const todayOrderStats = getDailyOrderStats(orderData?.data);
+    
+    // Count today's custom orders (they're text-based, no totalBill)
+    const getTodayCustomOrders = () => {
+        if (!custOrderData?.data || !Array.isArray(custOrderData.data)) return { count: 0, pending: 0 };
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const todayCustom = custOrderData.data.filter(order => {
+            const orderDate = new Date(order.createdAt);
+            orderDate.setHours(0, 0, 0, 0);
+            return orderDate.getTime() === today.getTime();
+        });
+        
+        const pending = todayCustom.filter(order => order.orderStatus === 'pending').length;
+        
+        return { count: todayCustom.length, pending };
+    };
+    
+    const todayCustomOrderStats = getTodayCustomOrders();
 
-    const lowStockProducts = [
-        { id: 1, name: 'Rice (1kg)', stock: 5, category: 'Grains' },
-        { id: 2, name: 'Cooking Oil (1L)', stock: 3, category: 'Oils' },
-        { id: 3, name: 'Wheat Flour (5kg)', stock: 7, category: 'Grains' }
-    ];
+    // Calculate pending orders based on filter
+    const getPendingOrders = () => {
+        if (pendingFilter === 'today') {
+            // Today's pending orders only
+            return (todayOrderStats.ordersByStatus?.pending || 0) + todayCustomOrderStats.pending;
+        } else {
+            // All time pending orders
+            const allRegularPending = (orderData?.data || []).filter(order => order.orderStatus === 'pending').length;
+            const allCustomPending = (custOrderData?.data || []).filter(order => order.orderStatus === 'pending').length;
+            return allRegularPending + allCustomPending;
+        }
+    };
+
+    // Combine stats
+    const stats = {
+        totalProducts: data?.data?.length || "....",
+        ordersToday: todayOrderStats.totalOrders || '....',
+        customOrdersToday: todayCustomOrderStats.count || 0,
+        revenue: todayOrderStats.totalRevenue || '....',
+        pendingOrders: getPendingOrders()
+    };
+
+    // Get combined recent orders from both regular and custom orders
+    const getRecentOrders = () => {
+        const regularOrders = orderData?.data || [];
+        const customOrders = custOrderData?.data || [];
+        
+        // Combine and map both order types
+        const allOrders = [
+            ...regularOrders.map(order => ({
+                id: order.orderId,
+                customer: order.firmName,
+                items: order.productOrders?.length || 0,
+                amount: order.totalBill,
+                status: order.orderStatus,
+                type: 'standard',
+                createdAt: order.createdAt
+            })),
+            ...customOrders.map(order => ({
+                id: order.orderId,
+                customer: order.firmName,
+                items: 'Custom',
+                amount: null, // Custom orders don't have amounts
+                status: order.orderStatus,
+                type: 'custom',
+                createdAt: order.createdAt
+            }))
+        ];
+
+        // Sort by createdAt (most recent first)
+        allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Get top 4 recent orders and calculate time ago
+        return allOrders.slice(0, 4).map(order => {
+            const timeAgo = getTimeAgo(order.createdAt);
+            return { ...order, time: timeAgo };
+        });
+    };
+
+    // Helper function to calculate time ago
+    const getTimeAgo = (dateString) => {
+        const now = new Date();
+        const createdAt = new Date(dateString);
+        const diffMs = now - createdAt;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 60) {
+            return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`;
+        } else if (diffHours < 24) {
+            return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+        } else {
+            return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+        }
+    };
+
+    const recentOrders = getRecentOrders();
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -109,7 +210,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
                         <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
                             <div className="flex items-center justify-between">
                                 <div>
@@ -149,13 +250,23 @@ export default function Dashboard() {
                         </div>
 
                         <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-600 font-medium">Pending</p>
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm text-gray-600 font-medium">Pending</p>
+                                        <select 
+                                            value={pendingFilter}
+                                            onChange={(e) => setPendingFilter(e.target.value)}
+                                            className="text-xs bg-gray-100 border-0 rounded-md px-2 py-1 focus:ring-2 focus:ring-yellow-400 outline-none cursor-pointer"
+                                        >
+                                            <option value="today">Today</option>
+                                            <option value="alltime">All Time</option>
+                                        </select>
+                                    </div>
                                     <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.pendingOrders}</h3>
                                     <p className="text-xs text-yellow-600 mt-1 font-medium">Action needed</p>
                                 </div>
-                                <div className="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center">
+                                <div className="w-14 h-14 bg-yellow-100 rounded-xl flex space-y-2 items-center justify-center">
                                     <Clock className="text-yellow-600" size={28} />
                                 </div>
                             </div>
@@ -171,56 +282,39 @@ export default function Dashboard() {
                             </div>
                             <div className="p-6">
                                 <div className="space-y-3">
-                                    {recentOrders.map((order) => (
-                                        <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                            <div className="flex-1">
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="font-bold text-gray-800">{order.id}</span>
-                                                    {order.type === 'custom' && (
-                                                        <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
-                                                            Custom
-                                                        </span>
+                                    {recentOrders.length > 0 ? (
+                                        recentOrders.map((order) => (
+                                            <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="font-bold text-gray-800">{order.id}</span>
+                                                        {order.type === 'custom' && (
+                                                            <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                                                                Custom
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-gray-600 mt-1">{order.customer}</p>
+                                                    <p className="text-xs text-gray-500">{order.time}</p>
+                                                </div>
+                                                <div className="text-right mr-4">
+                                                    <p className="text-sm text-gray-600">{order.items} {order.type === 'standard' && 'items'}</p>
+                                                    {order.amount !== null ? (
+                                                        <p className="text-lg font-bold text-gray-800">₹{order.amount}</p>
+                                                    ) : (
+                                                        <p className="text-sm text-purple-600 font-semibold">Text Order</p>
                                                     )}
                                                 </div>
-                                                <p className="text-sm text-gray-600 mt-1">{order.customer}</p>
-                                                <p className="text-xs text-gray-500">{order.time}</p>
-                                            </div>
-                                            <div className="text-right mr-4">
-                                                <p className="text-sm text-gray-600">{order.items} {order.type === 'standard' && 'items'}</p>
-                                                <p className="text-lg font-bold text-gray-800">₹{order.amount}</p>
-                                            </div>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>
-                                                {order.status}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Low Stock */}
-                        <div className="bg-white rounded-xl shadow-md">
-                            <div className="p-6 border-b">
-                                <div className="flex items-center space-x-2">
-                                    <AlertCircle className="text-red-500" size={20} />
-                                    <h3 className="text-xl font-bold text-gray-800">Low Stock</h3>
-                                </div>
-                            </div>
-                            <div className="p-6">
-                                <div className="space-y-4">
-                                    {lowStockProducts.map((product) => (
-                                        <div key={product.id} className="p-4 bg-red-50 rounded-lg border border-red-200">
-                                            <div className="flex items-start justify-between">
-                                                <div>
-                                                    <p className="font-semibold text-gray-800">{product.name}</p>
-                                                    <p className="text-xs text-gray-600 mt-1">{product.category}</p>
-                                                </div>
-                                                <span className="px-2 py-1 bg-red-500 text-white rounded-full text-xs font-bold">
-                                                    {product.stock}
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>
+                                                    {order.status}
                                                 </span>
                                             </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-8 text-gray-500">
+                                            No recent orders
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             </div>
                         </div>

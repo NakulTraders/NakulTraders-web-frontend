@@ -20,63 +20,83 @@ import DownloadSingleOrderApi from '../../../api/AuthAPI/DownloadSingleOrderApi'
 import DownloadCustomOrderApi from '../../../api/AuthAPI/DownloadCustomOrderApi';
 
 import Swal from 'sweetalert2';
+import { useQuery } from '@tanstack/react-query';
+
+import {  useEffect } from 'react';
 
 export default function AllOrders() {
-    const [loading, setLoading] = useState(false); // Login on\off
-    const [AllOrders, setAllOrders] = useState() //Store all Order data
-    const [ShowOrder, setShowOrder] = useState(false) // show customize data on\off
-    const [OrderText, setOrderText] = useState()
+    const [loading, setLoading] = useState(false);
+    const [AllOrders, setAllOrders] = useState([]);
+    const [ShowOrder, setShowOrder] = useState(false);
+    const [OrderText, setOrderText] = useState([]);
+
+    const { data: orderData, isLoading: orderDataLoading, error: orderError, refetch: orderRefetch } = useQuery({
+        queryKey: ["order"],
+        queryFn: getAllOrderApi,
+        staleTime: 20 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false
+    });
+    
+    const { data: custOrderData, isLoading: custOrderDataLoading, error: custOrderError, refetch: custOrderRefetch } = useQuery({
+        queryKey: ["customOrder"],
+        queryFn: getAllCustomizeOrderApi,
+        staleTime: 20 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false
+    });
 
     const getorder = async () => {
-        setLoading(true)
-        const data = await getAllOrderApi()
-        // console.log("all orders :", data.data);
-        setAllOrders(data.data)
+        setLoading(true);
+        
+        const orderdata = await orderData;
+        const customizeData = await custOrderData;
 
-        const customizeData = await getAllCustomizeOrderApi()
-        if (!customizeData) {
-
+        if (!orderData || !customizeData) {
+            setLoading(false);
             return Swal.fire({
                 icon: "error",
                 title: "Network error",
                 text: "Customize data not found",
-
             });
         }
-        setOrderText(customizeData.data)
-        // console.log("customize data :", customizeData.data);
+        setAllOrders(orderdata.data);
+        setOrderText(customizeData.data);
+        setLoading(false);
+    };
 
-        setLoading(false)
-    }
+    const handleRefresh = async () => {
+        setLoading(true);
+        try {
+            if (ShowOrder) {
+                await custOrderRefetch();
+            } else {
+                await orderRefetch();
+            }
+        } catch (error) {
+            console.error("Refresh failed:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const UpdateState = async (id, state, index) => {
         try {
-            // console.log("updating status:", state, "id:", id, "index:", index);
             const payload = { orderStatus: state };
-
-            const res = await updateOrderStatusApi(id, payload); // axios or fetch wrapper
-
-            // Normalize the updated order from response (works for many response shapes)
+            const res = await updateOrderStatusApi(id, payload);
             const updatedOrder = res?.data?.data ?? res?.data ?? res;
-            // console.log("api returned:", updatedOrder);
-
-            // 1) Update state by matching id (recommended — index may be unreliable)
             setAllOrders(prev => prev.map(item => (item._id === id ? updatedOrder : item)));
         } catch (err) {
             console.error("update failed", err);
-            alert("");
             Swal.fire({
                 icon: "error",
                 title: "Network error",
                 text: "Could not update order status. Try again.",
-
             });
         }
     };
 
     const DeleteOrder = async (id, index) => {
-        // console.log("id : ", id);
-
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -89,7 +109,7 @@ export default function AllOrders() {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Remove!",
-                    text: "Product has been removed .",
+                    text: "Product has been removed.",
                     icon: "success",
                     showConfirmButton: false,
                     timer: 1500
@@ -100,30 +120,18 @@ export default function AllOrders() {
                         icon: "error",
                         title: "Network error",
                         text: "Something went wrong!",
-
                     });
                 }
-
-                // 🔥 Remove item from AllOrders in UI
                 setAllOrders(prev => prev.filter((order) => order._id !== id));
             }
-        })
+        });
     };
 
-
-    // ================ Customize Order ==========================
     const custUpdateState = async (id, state, index) => {
         try {
-            // console.log("updating status:", state, "id:", id, "index:", index);
             const payload = { orderStatus: state };
-
-            const res = await UpdateCustomizeOrderStateApi(id, payload); // axios or fetch wrapper
-
-            // console.log("api returned:", res);
-            // Normalize the updated order from response (works for many response shapes)
+            const res = await UpdateCustomizeOrderStateApi(id, payload);
             const updatedOrder = res?.data;
-
-            // // 1) Update state by matching id (recommended — index may be unreliable)
             setOrderText(prev => prev.map(item => (item._id === id ? updatedOrder : item)));
         } catch (err) {
             console.error("update failed", err);
@@ -131,14 +139,11 @@ export default function AllOrders() {
                 icon: "error",
                 title: "Network error",
                 text: "Could not update order status. Try again.",
-
             });
         }
     };
 
-
     const custDeleteOrder = async (id, index) => {
-        // console.log("id : ", id);
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -151,7 +156,7 @@ export default function AllOrders() {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Remove!",
-                    text: "Product has been removed .",
+                    text: "Product has been removed.",
                     icon: "success",
                     showConfirmButton: false,
                     timer: 1500
@@ -160,23 +165,31 @@ export default function AllOrders() {
                 if (!deleteRes) {
                     return alert("Something went wrong!");
                 }
-                // 🔥 Remove item from AllOrders in UI
                 setOrderText(prev => prev.filter((order) => order._id !== id));
             }
         });
     };
 
+    // Fixed: Changed useState to useEffect
+    useEffect(() => {
+        getorder();
+    }, []);
 
-    useState(() => {
+    // Update data when refetch completes
+    useEffect(() => {
+        if (orderData?.data) {
+            setAllOrders(orderData.data);
+        }
+    }, [orderData]);
 
-        getorder()
-    }, [])
-
-
+    useEffect(() => {
+        if (custOrderData?.data) {
+            setOrderText(custOrderData.data);
+        }
+    }, [custOrderData]);
 
     return (
         <div className="bg-white rounded shadow p-4">
-            {/* <OrderTable orders={orders} /> */}
             {loading && <Loader />}
             {!loading && (
                 <div>
@@ -191,12 +204,16 @@ export default function AllOrders() {
                                     className='bg-sky-400 px-3 py-1 rounded'>
                                     {ShowOrder ? "Detail Orders" : "Customize Order"}
                                 </button>
-                                <button className='flex' onClick={() => getorder()} >
-                                    refresh
-                                    <HiRefresh className='text-2xl ' />
+                                <button 
+                                    className='flex items-center gap-1' 
+                                    onClick={handleRefresh}
+                                >
+                                    Refresh
+                                    <HiRefresh className='text-2xl' />
                                 </button>
                             </div>
                         </div>
+                   
                         {ShowOrder ? <div>
                             {/* ------------------- Text Order List ----------- */}
                             {OrderText?.slice().reverse().map((order, index) => {
