@@ -205,11 +205,11 @@ export default function AllOrders() {
                                     {ShowOrder ? "Detail Orders" : "Customize Order"}
                                 </button>
                                 <button 
-                                    className='flex items-center gap-1' 
+                                    className='flex items-center gap-1 mt-0' 
                                     onClick={handleRefresh}
                                 >
                                     Refresh
-                                    <HiRefresh className='text-2xl' />
+                                    <HiRefresh className='text-2xl mt-0' />
                                 </button>
                             </div>
                         </div>
@@ -227,7 +227,7 @@ export default function AllOrders() {
                                             >
                                                 <Typography component="span">
                                                     {/* HEADER */}
-                                                    <div className="flex w-full mt-0 justify-between items-start border-b pb-4 mb-4 space-x-10">
+                                                    <div className="flex w-full  justify-between items-start border-b pb-4 mb-4 space-x-10">
                                                         <div>
                                                             <h2 className="text-2xl font-bold text-gray-800">{order.firmName}</h2>
                                                             <div className="flex space-x-10 ">
