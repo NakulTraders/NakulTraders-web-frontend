@@ -24,13 +24,14 @@ function App() {
       <Route path="/list" element={<OrderList/>}></Route>
       <Route path="/orderForm" element={<OrderFormPg/>}></Route>
       <Route path="/products" element={<ProductsPg/>}></Route>
+      <Route path="/customizeOrder" element={<CustomizeOrderPG/>}></Route>
+
       </Route>
 
 
       <Route element={<AdminLayout/>}>
       <Route path="/admin" element={<AdminLogin/>}></Route>
       <Route path="/admindashboard" element={<AdminApp/>}></Route>
-      <Route path="/customizeOrder" element={<CustomizeOrderPG/>}></Route>
       </Route>
      
     </Routes>
