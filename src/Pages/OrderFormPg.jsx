@@ -9,7 +9,7 @@ import html2canvas from "html2canvas";
 
 
 export default function OrderFormPg() {
-    const [orderResp ,setorderResp] = useState({})
+    const [orderResp, setorderResp] = useState({})
     const [loading, setLoading] = useState(false);
     const navigator = useNavigate()
     const [formData, setFormData] = useState({
@@ -105,7 +105,7 @@ export default function OrderFormPg() {
         link.click();
     };
 
-   
+
 
 
     // Handle Submit
@@ -142,12 +142,12 @@ export default function OrderFormPg() {
 
         setorderResp(resp.data)
         setLoading(false)
-         // open whatsApp on onClick
-    const openWhatsApp = () => {
-        console.log("order detail alert ====== :",resp.data);
+        // open whatsApp on onClick
+        const openWhatsApp = () => {
+            console.log("order detail alert ====== :", resp.data);
 
-        const phoneNumber = "919407391999"; // country code + number
-        const message = `
+            const phoneNumber = "919407391999"; // country code + number
+            const message = `
         Order is Confirmed 
         Order Id : ${resp.data.orderId}
         Name : ${resp.data.firmName}
@@ -155,12 +155,12 @@ export default function OrderFormPg() {
         Transportation : ${resp.data.transportation}
         `;
 
-        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        window.open(url, "_blank");
+            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, "_blank");
 
-        navigator('/')
-    };
-        
+            navigator('/')
+        };
+
         Swal.fire({
             position: "center",
             icon: "success",
@@ -211,7 +211,7 @@ export default function OrderFormPg() {
                             // Swal.close();               // ✅ close ONLY after click
 
                         });
-                    document.getElementById("GoToWhatsApp").addEventListener("click", ()=>{openWhatsApp() ;  Swal.close();})
+                    document.getElementById("GoToWhatsApp").addEventListener("click", () => { openWhatsApp(); Swal.close(); })
                 }
             });
         })
@@ -251,11 +251,11 @@ export default function OrderFormPg() {
         setorderResp(resp.data)
 
         // open whatsApp on onClick
-    const openWhatsApp = () => {
-        // console.log("order detail alert ====== :",resp.data);
+        const openWhatsApp = () => {
+            // console.log("order detail alert ====== :",resp.data);
 
-        const phoneNumber = "919407391999"; // country code + number
-        const message = `
+            const phoneNumber = "919407391999"; // country code + number
+            const message = `
         Order is Confirmed 
         Order Id : ${resp.data.orderId}
         Name : ${resp.data.firmName}
@@ -263,11 +263,11 @@ export default function OrderFormPg() {
         Transportation : ${resp.data.transportation}
         `;
 
-        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        window.open(url, "_blank");
+            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, "_blank");
 
-        navigator('/')
-    };
+            navigator('/')
+        };
 
         Swal.fire({
             position: "center",
@@ -280,7 +280,7 @@ export default function OrderFormPg() {
             navigator("/")
         }).then(() => {
             // console.log("order detail alert :",orderResp);
-            
+
             Swal.fire({
                 title: "Order Confirmed 🎉",
                 html: `
@@ -318,7 +318,7 @@ export default function OrderFormPg() {
                             await captureAndDownload(); // screenshot + download
                             // Swal.close();               // ✅ close ONLY after click
                         });
-                    document.getElementById("GoToWhatsApp").addEventListener("click", ()=>{openWhatsApp() ;  Swal.close();})
+                    document.getElementById("GoToWhatsApp").addEventListener("click", () => { openWhatsApp(); Swal.close(); })
 
                 }
             });
@@ -326,9 +326,9 @@ export default function OrderFormPg() {
 
     };
 
-    
 
-    
+
+
 
     return (
         <div className="min-h-screen bg-gray-100 px-4 py-10 md:py-20 flex justify-center">
@@ -421,6 +421,14 @@ export default function OrderFormPg() {
                             placeholder="Enter address"
                             className="w-full mt-1 p-3 border rounded-lg h-24 focus:ring-2 focus:ring-blue-500"
                         ></textarea>
+                    </div>
+                    <div className="mt-4 rounded-lg border border-red-500 bg-red-50 px-4 py-3 text-center animate-pulse">
+                        <p className="text-lg font-semibold text-red-700">
+                            ⚠️ ₹10 per parcel will be charged for transport delivery .
+                        </p>
+                        <p className="mt-1 text-lg font-semibold text-red-700">
+                            ⚠️ 10 रुपये प्रति डाक ट्रांसपोर्ट के लिए लिया जाएगा 
+                        </p>
                     </div>
 
                     {/* Submit Button */}
