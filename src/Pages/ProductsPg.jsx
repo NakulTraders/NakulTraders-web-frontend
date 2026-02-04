@@ -146,7 +146,7 @@ const ProductsPg = () => {
 
     localStorage.setItem("cartList", JSON.stringify(existing));
 
-   
+
     Swal.fire({
       position: "top-end",
       icon: "success",
@@ -289,7 +289,20 @@ const ProductsPg = () => {
                           type="number"
                           name="orderQuentity"
                           value={OrderPD.packeging[i]?.orderQuentity || ""}
-                          onChange={(e) => handlePackegChange(i, e)}
+                          min='0'
+                          onWheel={(e) => e.target.blur()}
+                          onKeyDown={(e) => {
+                            if (e.key === '-' || e.key === 'e') {
+                              e.preventDefault()
+                            }
+                          }}
+                          // onChange={(e) => handlePackegChange(i, e)}
+                          onChange={(e) => {
+                            const value = e.target.value
+                            if (Number(value) >= 0 || value === '') {
+                              handlePackegChange(i, e)
+                            }
+                          }}
                           className="w-14 rounded border border-gray-300 px-1 py-1 
                          focus:outline-none focus:ring-0 focus:border-transparent "
                         />

@@ -1,7 +1,7 @@
 import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import UserLayout from "./layouts/UserLayout";
 import AdminLayout from "./layouts/AdminLayout";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import OrderList from "./Pages/OrderList";
 import Navbar from "./Component/Navbar";
 import LayoutPg from "./Pages/LayoutPg";
