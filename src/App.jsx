@@ -11,7 +11,7 @@ import AdminApp from "./AdminApp";
 import AdminLogin from "./Pages/admin/AdminLogin";
 import OrderFormPg from "./Pages/OrderFormPg";
 import CustomizeOrderPG from "./Pages/CustomizeOrderPg";
-
+import { Analytics } from '@vercel/analytics/react';
 
 
 
@@ -35,7 +35,7 @@ function App() {
       </Route>
      
     </Routes>
-    
+    <Analytics />
   </>);
 }
 
